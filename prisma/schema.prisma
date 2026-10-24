@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── پیکربندی سایت (داینامیک - قابل ویرایش توسط ادمین) ───
+model SiteSettings {
+  id            Int     @id @default(1)
+  appName       String  @default("ماهی‌یار")
+  appSlogan     String  @default("سفارش آنلاین ماهی تازه")
+  heroImage     String?
+  heroTitle     String  @default("طعم و لذیذ")
+  heroSubtitle  String  @default("بی‌نظیر")
+  heroCtaText   String  @default("شروع سفارش")
+  heroBadgeText String  @default("ماهی و غذای دریایی")
+  promoTitle    String  @default("سفارش آنلاین")
+  promoSubtitle String  @default("همیشه کنارت")
+  addressText   String  @default("اصفهان، خیابان نصر، جنوب بلوار شهید فهمیده")
+  workHours     String  @default("۱۱:۰۰ الی ۲۳:۰۰")
+  phone         String  @default("۰۹۱۹۱۴۹۴۵۵۷")
+  footerNote    String  @default("عشق ماهی، عشق تازگی")
+  instagram     String  @default("mahi_yar")
+}
+
+// ─── دسته‌بندی ماهی (قزل آلا، کپور، ...) ───
+model FishCategory {
+  id     String  @id @default(cuid())
+  name   String
+  image  String?
+  order  Int     @default(0)
+  active Boolean @default(true)
+  fishes Fish[]
+}
+
+// ─── انواع ماهی ───
+model Fish {
+  id          String       @id @default(cuid())
+  name        String
+  image       String
+  description String
+  price       Int // تومان - قیمت هر عدد ماهی
+  badgeText   String?
+  categoryId  String
+  category    FishCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  active      Boolean      @default(true)
+  order       Int          @default(0)
+  favorites   Favorite[]
+}
+
+// ─── حَشو (گزینه‌های اختیاری با قیمت خودشان) ───
+model Extra {
+  id     String  @id @default(cuid())
+  name   String
+  image  String
+  price  Int
+  active Boolean @default(true)
+  order  Int     @default(0)
+}
+
+// ─── بازه‌های زمانی تحویل ───
+model TimeSlot {
+  id     String  @id @default(cuid())
+  label  String // «۱۱:۰۰ تا ۱۳:۰۰»
+  shift  String // «ظهر» / «عصر»
+  icon   String  @default("sun") // sun | moon
+  active Boolean @default(true)
+  order  Int     @default(0)
+}
+
+// ─── روش دریافت کالا ───
+model DeliveryMethod {
+  id       String  @id @default(cuid())
+  code     String  @unique // in_place | round_trip | one_way
+  title    String
+  subtitle String
+  price    Int     @default(0)
+  icon     String  @default("home")
+  active   Boolean @default(true)
+  order    Int     @default(0)
+}
+
+// ─── پروفایل کاربر (تک‌کاربر) ───
+model Profile {
+  id     String  @id @default(cuid())
+  name   String  @default("احسان")
+  phone  String  @default("۰۹۱۲۱۴۴۹۰۵۴")
+  avatar String?
+  role   String  @default("کاربر عالی")
+  note   String  @default("عشق ماهی، عشق تازگی")
+}
+
+// ─── آدرس‌های ذخیره‌شده ───
+model Address {
+  id        String   @id @default(cuid())
+  title     String // خانه، محل کار...
+  full      String
+  receiver  String?
+  phone     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─── علاقه‌مندی‌ها ───
+model Favorite {
+  id        String   @id @default(cuid())
+  fishId    String
+  fish      Fish     @relation(fields: [fishId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ─── سفارش‌ها ───
+model Order {
+  id                 String   @id @default(cuid())
+  code               String   @default(cuid())
+  status             String   @default("preparing") // preparing | delivered | canceled
+  fishId             String?
+  fishName           String
+  fishImage          String
+  fishPrice          Int
+  quantity           Int      @default(1)
+  extrasJson         String   @default("[]") // [{name, price, image}]
+  extrasTotal        Int      @default(0)
+  deliveryMethodTitle String
+  deliveryPrice      Int      @default(0)
+  timeSlotLabel      String
+  timeSlotShift      String   @default("")
+  addressFull        String
+  receiver           String
+  receiverPhone      String
+  note               String?
+  total              Int
+  createdAt          DateTime @default(now())
+}

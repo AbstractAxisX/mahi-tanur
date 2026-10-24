@@ -1,0 +1,177 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-vazir);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius) + 4px;
+
+  /* ─── پالت ماهی‌یار (مطابق موکاپ) ─── */
+  --color-brand: #ec407a;
+  --color-brand-deep: #d81b60;
+  --color-brand-dark: #ad1457;
+  --color-brand-mid: #f06292;
+  --color-brand-soft: #f8bbd0;
+  --color-brand-mist: #fce4ec;
+  --color-brand-faint: #fff0f5;
+  --color-teal-brand: #00bcd4;
+  --color-teal-deep: #00acc1;
+  --color-teal-mist: #b2ebf2;
+  --color-ink: #4a154b;
+  --color-ink-2: #4a148c;
+  --color-body: #666666;
+  --color-grey: #78909c;
+}
+
+:root {
+  --radius: 1.25rem;
+  --background: #f8bbd0;
+  --foreground: #4a154b;
+  --card: #ffffff;
+  --card-foreground: #4a154b;
+  --popover: #ffffff;
+  --popover-foreground: #4a154b;
+  --primary: #ec407a;
+  --primary-foreground: #ffffff;
+  --secondary: #fce4ec;
+  --secondary-foreground: #ad1457;
+  --muted: #fce4ec;
+  --muted-foreground: #78909c;
+  --accent: #fce4ec;
+  --accent-foreground: #ad1457;
+  --destructive: #e53935;
+  --destructive-foreground: #ffffff;
+  --border: #f8bbd0;
+  --input: #fce4ec;
+  --ring: #ec407a;
+  --chart-1: #ec407a;
+  --chart-2: #00bcd4;
+  --chart-3: #f06292;
+  --chart-4: #ad1457;
+  --chart-5: #b2ebf2;
+}
+
+.dark {
+  --background: #2a1225;
+  --foreground: #fce4ec;
+  --card: #3a1a33;
+  --card-foreground: #fce4ec;
+  --popover: #3a1a33;
+  --popover-foreground: #fce4ec;
+  --primary: #ec407a;
+  --primary-foreground: #ffffff;
+  --secondary: #4a2243;
+  --secondary-foreground: #f8bbd0;
+  --muted: #4a2243;
+  --muted-foreground: #c9a3b8;
+  --accent: #4a2243;
+  --accent-foreground: #f8bbd0;
+  --destructive: #e53935;
+  --destructive-foreground: #ffffff;
+  --border: #4a2243;
+  --input: #4a2243;
+  --ring: #ec407a;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* اعداد فارسی به‌صورت پیش‌فرض در فیلدهای عددی */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* اسکرول‌بار ظریف صورتی */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #f48fb1 transparent;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #f48fb1;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* مخفی‌کردن اسکرول‌بار کاروسل‌ها */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* کارت استاندارد ماهی‌یار */
+.my-card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 6px 24px rgba(236, 64, 122, 0.14);
+}
+.my-card-sm {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 3px 14px rgba(236, 64, 122, 0.12);
+}
+
+/* موج تزئینی */
+.my-wave {
+  background-image: radial-gradient(circle at 10px -6px, transparent 12px, currentColor 13px);
+  background-size: 20px 12px;
+  height: 12px;
+}
