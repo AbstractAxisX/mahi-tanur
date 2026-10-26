@@ -86,25 +86,23 @@ export default function SettingsView() {
   return (
     <div>
       {/* ═══ سربرگ با پس‌زمینه ساحلی + کارت کاربر (مطابق موکاپ) ═══ */}
-      <div className="relative -mx-4 -mt-1 overflow-hidden pb-6">
+      <div className="relative -mx-4 -mt-1 overflow-hidden pb-6 rounded-t-lg">
         {/* تصویر ساحلی پشت سربرگ (داینامیک از تنظیمات) */}
-        <div className="absolute inset-0" aria-hidden>
+        <div className="absolute inset-0 rounded-t-xl" aria-hidden>
           <Image
             src={settings?.heroImage || "/assets/hero-bg.png"}
             alt=""
             fill
             priority
             unoptimized
-            className="object-cover object-top"
+            className="object-cover object-top rounded-xl"
             sizes="(max-width: 768px) 100vw, 448px"
           />
         </div>
 
         {/* ردیف سربرگ: بازگشت + عنوان + لوگو */}
         <div className="relative z-10 flex items-center justify-between gap-2 px-4 pt-3 pb-4">
-          <CircleBtn label="بازگشت" onClick={back}>
-            <ChevronRight className="h-6 w-6" strokeWidth={2.8} />
-          </CircleBtn>
+
           <div className="flex-1 text-center">
             <h1 className="text-[23px] font-black text-white leading-8 inline-flex items-center gap-1.5 drop-shadow-[0_2px_6px_rgba(88,24,69,.55)]">
               <PiSparkle className="h-4 w-4 text-white/90" aria-hidden />
@@ -113,25 +111,21 @@ export default function SettingsView() {
             </h1>
             <Waves className="h-2.5 w-20 mx-auto text-white/95 drop-shadow-[0_1px_3px_rgba(88,24,69,.5)]" strokeWidth={2.5} aria-hidden />
           </div>
-          <div className="w-11 shrink-0 flex justify-start">
-            <span className="grid place-items-center rounded-full bg-white/85 px-2 py-1 shadow-sm">
-              <MahiLogo size="sm" />
-            </span>
-          </div>
+
         </div>
 
         {/* کارت کاربر روی تصویر — آواتار چپ + نام/شماره/ویرایش راست */}
-        <div className="relative z-10 px-4">
+        <div className="relative z-10 px-4 -mx-1">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[24px] bg-white/90 backdrop-blur-md p-4 shadow-[0_8px_28px_rgba(168,20,87,.22)] border border-white/60"
+            className="rounded-[24px]  bg-white/90 backdrop-blur-md p-4 shadow-[0_8px_28px_rgba(168,20,87,.22)]"
           >
-        <div className="flex flex-row-reverse items-center gap-4">
+        <div className="flex flex-row-reverse items-center gap-4 ">
           {/* آواتار با تاج و بج دوربین */}
           <div className="relative shrink-0">
             <PiCrownFill className="absolute -top-2.5 right-3 h-5 w-5 text-[#f4a740] drop-shadow-[0_1px_2px_rgba(0,0,0,.2)] z-10" aria-hidden />
-            <span className="block h-[78px] w-[78px] rounded-full overflow-hidden border-[3px] border-white ring-2 ring-brand-mist shadow-[0_4px_12px_rgba(236,64,122,.2)] bg-brand-faint">
+            <span className="block h-[90px] w-[90px] rounded-full overflow-hidden border-[3px] border-white ring-2 ring-brand-mist shadow-[0_4px_12px_rgba(236,64,122,.2)] bg-brand-faint">
               {profile?.avatar ? (
                 <Image src={profile.avatar} alt={profile?.name || "کاربر"} width={78} height={78} unoptimized className="h-full w-full object-cover" />
               ) : (
@@ -181,10 +175,7 @@ export default function SettingsView() {
         </div>
 
         {/* شعار پایین کارت */}
-        <p className="mt-3.5 text-center text-[12.5px] font-bold text-brand-dark/80 inline-flex items-center gap-1.5 w-full justify-center">
-          {profile?.note || "عاشق ماهی، عشق نزدیکه"}
-          <Heart className="h-3.5 w-3.5 fill-brand text-brand" aria-hidden />
-        </p>
+
           </motion.div>
         </div>
       </div>
@@ -215,7 +206,7 @@ export default function SettingsView() {
 
       {/* ═══ بنر تبلیغاتی (فقط عکس از بک‌اند) ═══ */}
       {settings?.promoImage ? (
-        <div className="relative mt-4 aspect-[16/8] rounded-[22px] overflow-hidden shadow-[0_8px_22px_rgba(236,64,122,.16)]">
+        <div className="relative mt-4 aspect-[16/6] rounded-[22px] overflow-hidden shadow-[0_8px_22px_rgba(236,64,122,.16)]">
           <Image src={settings.promoImage} alt="بنر تبلیغاتی" fill unoptimized className="object-cover" sizes="430px" />
         </div>
       ) : null}

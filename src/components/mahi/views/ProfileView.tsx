@@ -131,13 +131,11 @@ export default function ProfileView() {
             </span>
           </div>
         </div>
-        <p className="text-center text-[12px] font-black text-brand mt-3.5 border-t border-dashed border-brand-soft pt-3">
-          عشق ماهی، عشق تازگی <span aria-hidden>❤️</span>
-        </p>
+
       </motion.section>
 
       {/* آمار سریع */}
-      <section aria-label="آمار حساب" className="grid grid-cols-4 gap-2.5">
+      <section aria-label="آمار حساب" className="grid grid-cols-4 gap-2.5 bg-white p-2 rounded-lg">
         {stats.map((s) => {
           const Icon = s.icon;
           return (

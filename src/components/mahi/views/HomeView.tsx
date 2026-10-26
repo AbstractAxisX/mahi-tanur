@@ -37,7 +37,7 @@ export default function HomeView() {
       {/* ═══════════ کاور تمام‌عرض (تا نیمه صفحه) ═══════════ */}
       <section
         aria-label="کاور اصلی"
-        className="relative -mx-4 -mt-1 h-[46vh] min-h-[350px] max-h-[540px] overflow-hidden"
+        className="relative -mx-4 -mt-1 h-[46vh] min-h-[350px] max-h-[540px]"
       >
         {/* عکس پس‌زمینه صورتی (داینامیک از پنل ادمین) */}
         <Image
@@ -72,24 +72,11 @@ export default function HomeView() {
           </CircleBtn>
         </div>
 
-        {/* متن میانی کاور */}
-        <div className="absolute inset-x-0 bottom-12 z-10 flex flex-col items-center px-6 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-brand/90 text-white text-[11px] font-extrabold px-3.5 py-1.5 shadow-md">
-            <PiFish className="h-4 w-4" aria-hidden />
-            {settings?.heroBadgeText || "ماهی و غذای دریایی"}
-          </span>
-          <div className="mt-3 drop-shadow-[0_3px_8px_rgba(88,24,69,.6)]">
-            <span className="text-white text-[34px] font-black leading-tight">{settings?.heroTitle}</span>{" "}
-            <span className="text-white text-[26px] font-extrabold leading-tight">{settings?.heroSubtitle}</span>
-            <Waves className="h-3.5 w-36 mx-auto mt-1 text-white/95" aria-hidden />
-          </div>
-        </div>
-
         {/* دکمه ثبت سفارش (لبه کاور، آیکون ظریف + حاشیه سفید کم) */}
         <button
           type="button"
           onClick={() => go("menu")}
-          className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 rounded-full bg-brand px-7 h-[52px] text-white text-[16.5px] font-black border-2 border-white/95 shadow-[0_10px_26px_rgba(168,20,87,.5)] active:scale-95 transition-transform"
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 rounded-full bg-brand px-7 h-[52px] text-white text-[16.5px] font-black border-2 border-white/95 shadow-[0_10px_26px_rgba(168,20,87,.3)] active:scale-95 transition-transform"
         >
           {settings?.heroCtaText || "ثبت سفارش"}
           <PiFishSimple className="h-[21px] w-[21px] opacity-95" aria-hidden />
@@ -99,7 +86,7 @@ export default function HomeView() {
       {/* ═══════════ چهار ویژگی (گردی بالا، محوی پایین، سفید مایل به صورتی) ═══════════ */}
       <section
         aria-label="ویژگی‌های ما"
-        className="relative mt-10 rounded-t-[28px] bg-[#fff3f7] pt-5 px-2.5 pb-12"
+        className="relative -mt-10 rounded-t-[28px] bg-[#fff3f7] pt-5 px-2.5 pb-12 -mx-4 "
         style={{
           maskImage: "linear-gradient(to bottom, black calc(100% - 34px), transparent 100%)",
           WebkitMaskImage: "linear-gradient(to bottom, black calc(100% - 34px), transparent 100%)",
@@ -124,11 +111,11 @@ export default function HomeView() {
       {/* ═══════════ انواع ماهی ها (تب برآمده + ۴ کارت در ردیف) ═══════════ */}
       <section
         aria-label="انواع ماهی‌ها"
-        className="relative -mt-7 z-10 mx-2 rounded-[26px] bg-[#ffe7f0] shadow-[0_10px_26px_rgba(236,64,122,.10)] pt-9 pb-4 px-2.5"
+        className="relative -mt-7 z-10 -mx-3 rounded-[26px] bg-gradient-to-b from-[#ffcddf] to-transparent pt-9 pb-4 px-2.5"
       >
         {/* عنوان داخل باکس رنگی برآمده از بالای سکشن */}
         <div className="absolute -top-[17px] inset-x-0 flex justify-center" aria-hidden={false}>
-          <span className="inline-flex items-center gap-2 rounded-full bg-[#f6b6cf] px-6 py-[7px] shadow-[0_6px_16px_rgba(236,64,122,.22)]">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#ffcddf] px-6 py-[7px] ">
             <PiFish className="h-5 w-5 text-brand-deep -scale-x-100" aria-hidden />
             <h2 className="text-[16px] font-black text-brand-dark leading-6">انواع ماهی ها</h2>
             <PiFish className="h-5 w-5 text-brand-deep" aria-hidden />

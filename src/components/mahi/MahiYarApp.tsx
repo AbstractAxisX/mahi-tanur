@@ -50,7 +50,7 @@ function BottomNav() {
   return (
     <nav
       aria-label="ناوبری اصلی"
-      className="bg-[#f9c7da] backdrop-blur rounded-t-[28px] shadow-[0_-6px_24px_rgba(216,27,96,.14)] pb-[max(env(safe-area-inset-bottom),10px)]"
+      className="bg-[#fddde9] backdrop-blur rounded-t-[28px] shadow-[0_-6px_24px_rgba(216,27,96,.14)] pb-[max(env(safe-area-inset-bottom),10px)]"
     >
       <div className="max-w-md mx-auto grid grid-cols-5 items-end px-2 pt-2">
         {NAV.map((item) => {
@@ -74,8 +74,8 @@ function BottomNav() {
                     active
                       ? "bg-brand-deep shadow-[0_10px_22px_rgba(216,27,96,.45)]"
                       : "bg-brand shadow-[0_8px_18px_rgba(236,64,122,.38)]"
-                  } h-[64px] w-14`}
-                  style={{ borderRadius: "50% 50% 42% 42% / 64% 64% 36% 36%" }}
+                  } h-14 w-14 rounded-full`}
+                  
                 >
                   {active ? <Filled className="h-7 w-7" aria-hidden /> : <Outline className="h-7 w-7" aria-hidden />}
                 </span>
