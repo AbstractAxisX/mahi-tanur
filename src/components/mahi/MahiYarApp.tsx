@@ -7,6 +7,7 @@ import { AppProvider, useApp } from "./AppContext";
 import { MahiLogo, CircleBtn, DrawerItem } from "./ui";
 import { toFaDigits } from "@/lib/format";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { PiFish, PiFishFill, PiHouse, PiHouseFill, PiClipboardText, PiClipboardTextFill, PiUser, PiUserFill, PiGear, PiGearFill } from "react-icons/pi";
 import { Waves, Home, Fish, ClipboardList, User, Settings as SettingsIcon, Menu as MenuIcon, ShoppingBasket, MapPin, Heart, LayoutGrid, X } from "lucide-react";
 
 import HomeView from "./views/HomeView";
@@ -23,19 +24,19 @@ import FavoritesView from "./views/FavoritesView";
 import SettingsView from "./views/SettingsView";
 
 const NAV = [
-  { key: "settings", view: "settings" as const, label: "تنظیمات", icon: SettingsIcon },
-  { key: "fish", view: "menu" as const, label: "ماهی", icon: Fish },
-  { key: "home", view: "home" as const, label: "خانه", icon: Home },
-  { key: "orders", view: "orders" as const, label: "سفارشات", icon: ClipboardList },
-  { key: "profile", view: "profile" as const, label: "پروفایل", icon: User },
+  { key: "settings", view: "settings" as const, label: "تنظیمات", outline: PiGear, filled: PiGearFill },
+  { key: "fish", view: "menu" as const, label: "ماهی", outline: PiFish, filled: PiFishFill },
+  { key: "home", view: "home" as const, label: "خانه", outline: PiHouse, filled: PiHouseFill },
+  { key: "orders", view: "orders" as const, label: "سفارشات", outline: PiClipboardText, filled: PiClipboardTextFill },
+  { key: "profile", view: "profile" as const, label: "پروفایل", outline: PiUser, filled: PiUserFill },
 ];
 
 function Loader() {
   return (
-    <div className="min-h-screen grid place-items-center bg-gradient-to-b from-brand-soft to-brand-mid/70">
+    <div className="min-h-screen grid place-items-center bg-gradient-to-b from-[#fbdcef] to-[#f9c9dd]">
       <div className="text-center animate-pulse">
         <div className="text-5xl mb-3">🐟</div>
-        <p className="font-extrabold text-2xl text-ink">ماهی‌یار</p>
+        <p className="font-extrabold text-2xl text-ink">ماهی تنو</p>
         <p className="text-ink/60 text-sm mt-1">در حال آماده‌سازی منوی تازه‌ها…</p>
         <Waves className="h-4 w-28 mx-auto mt-3 text-teal-brand" aria-hidden />
       </div>
@@ -43,14 +44,21 @@ function Loader() {
   );
 }
 
+/* ───────── نوار پایین: آیکون‌های صورتی، آوت‌لاین/توپر + خانه قطره‌ای ───────── */
 function BottomNav() {
   const { view, go } = useMahiStore();
   return (
-    <nav aria-label="ناوبری اصلی" className="bg-white/95 backdrop-blur rounded-t-[28px] shadow-[0_-6px_24px_rgba(236,64,122,.18)] pb-[max(env(safe-area-inset-bottom),10px)]">
+    <nav
+      aria-label="ناوبری اصلی"
+      className="bg-white/95 backdrop-blur rounded-t-[28px] shadow-[0_-6px_24px_rgba(236,64,122,.15)] pb-[max(env(safe-area-inset-bottom),10px)]"
+    >
       <div className="max-w-md mx-auto grid grid-cols-5 items-end px-2 pt-2">
         {NAV.map((item) => {
           const active = view === item.view;
-          const Icon = item.icon;
+          const Outline = item.outline;
+          const Filled = item.filled;
+
+          /* دکمه خانه وسط — بیرون‌زدگی قطره‌ای بدون حاشیه سفید */
           if (item.key === "home") {
             return (
               <button
@@ -58,20 +66,27 @@ function BottomNav() {
                 type="button"
                 onClick={() => go("home")}
                 aria-label={item.label}
-                aria-current={view === "home" ? "page" : undefined}
-                className="flex flex-col items-center -mt-5"
+                aria-current={active ? "page" : undefined}
+                className="flex flex-col items-center -mt-7"
               >
                 <span
-                  className={`h-14 w-14 rounded-full grid place-items-center border-4 border-white transition-transform active:scale-95 ${
-                    view === "home" ? "bg-brand text-white shadow-[0_8px_20px_rgba(236,64,122,.45)]" : "bg-brand-mist text-brand-deep"
-                  }`}
+                  className={`grid place-items-center text-white transition-all duration-300 ${
+                    active
+                      ? "bg-brand-deep shadow-[0_10px_22px_rgba(216,27,96,.45)]"
+                      : "bg-brand shadow-[0_8px_18px_rgba(236,64,122,.38)]"
+                  } h-[64px] w-14`}
+                  style={{ borderRadius: "50% 50% 42% 42% / 64% 64% 36% 36%" }}
                 >
-                  <Icon className="h-7 w-7" strokeWidth={2.4} />
+                  {active ? <Filled className="h-7 w-7" aria-hidden /> : <Outline className="h-7 w-7" aria-hidden />}
                 </span>
-                <span className={`text-[11px] mt-1 font-extrabold ${view === "home" ? "text-brand" : "text-grey"}`}>{item.label}</span>
+                <span className={`text-[11px] mt-1.5 font-extrabold ${active ? "text-brand" : "text-brand-mid"}`}>
+                  {item.label}
+                </span>
               </button>
             );
           }
+
+          /* بقیه آیتم‌ها — سلکت‌شده توپر، سلکت‌نشده آوت‌لاین (هر دو صورتی) */
           return (
             <button
               key={item.key}
@@ -79,10 +94,14 @@ function BottomNav() {
               onClick={() => go(item.view)}
               aria-label={item.label}
               aria-current={active ? "page" : undefined}
-              className="flex flex-col items-center gap-1 pt-2 pb-1"
+              className="flex flex-col items-center gap-1 pt-2 pb-1 active:scale-95 transition-transform"
             >
-              <Icon className={`h-6 w-6 ${active ? "text-brand" : "text-grey"}`} strokeWidth={2.2} />
-              <span className={`text-[11px] font-bold ${active ? "text-brand" : "text-grey"}`}>{item.label}</span>
+              {active ? (
+                <Filled className="h-[26px] w-[26px] text-brand" aria-hidden />
+              ) : (
+                <Outline className="h-[26px] w-[26px] text-brand-mid" aria-hidden />
+              )}
+              <span className={`text-[11px] font-bold ${active ? "text-brand" : "text-brand-mid"}`}>{item.label}</span>
             </button>
           );
         })}
@@ -111,7 +130,7 @@ function DrawerMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[86vw] max-w-[340px] bg-brand-faint border-none p-0 rounded-l-[28px]">
         <SheetHeader className="sr-only">
-          <SheetTitle>منوی اصلی ماهی‌یار</SheetTitle>
+          <SheetTitle>منوی اصلی ماهی تنو</SheetTitle>
           <SheetDescription>ناوبری به بخش‌های مختلف برنامه</SheetDescription>
         </SheetHeader>
         <div className="p-5 bg-gradient-to-l from-brand to-brand-mid text-white rounded-l-[28px] relative overflow-hidden">
@@ -143,7 +162,7 @@ function DrawerMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
 }
 
 function ViewRouter() {
-  const { view } = useMahiStore();
+  const { view, params } = useMahiStore();
   switch (view) {
     case "home": return <HomeView />;
     case "menu": return <MenuView />;
@@ -183,8 +202,15 @@ function Shell() {
   const { data } = useApp();
   const [drawer, setDrawer] = useState(false);
   const cartCount = useMahiStore((s) => s.cart.length);
-  const showTopBar = view === "home";
+  const isHome = view === "home";
   const hideNav = view === "fish" || view === "cart";
+
+  /* باز شدن منوی کشویی از دکمه شناور روی کاور صفحه اصلی */
+  useEffect(() => {
+    const open = () => setDrawer(true);
+    window.addEventListener("mahi:open-drawer", open);
+    return () => window.removeEventListener("mahi:open-drawer", open);
+  }, []);
 
   const topBar = useMemo(
     () => (
@@ -192,27 +218,36 @@ function Shell() {
         <CircleBtn label="منو" onClick={() => setDrawer(true)}>
           <MenuIcon className="h-6 w-6" strokeWidth={2.6} />
         </CircleBtn>
-        <div className="flex-1 text-center leading-6">
-          <div className="font-black text-[22px] text-ink drop-shadow-[0_1px_0_rgba(255,255,255,.6)]">
-            ماهی‌یار
-          </div>
-          <div className="text-[11px] font-bold text-ink-2/80">{data?.settings?.appSlogan || "سفارش آنلاین ماهی تازه"}</div>
+        <div className="flex-1 flex justify-center">
+          {data?.settings?.logoImage ? (
+            <span className="relative block h-12 w-24">
+              <Image src={data.settings.logoImage} alt={data.settings.appName} fill unoptimized className="object-contain" sizes="96px" />
+            </span>
+          ) : (
+            <div className="text-center leading-6">
+              <div className="font-black text-[22px] text-ink drop-shadow-[0_1px_0_rgba(255,255,255,.6)]">
+                {data?.settings?.appName || "ماهی تنو"}
+              </div>
+              <div className="text-[11px] font-bold text-ink-2/80">{data?.settings?.appSlogan || "سفارش آنلاین ماهی تازه"}</div>
+            </div>
+          )}
         </div>
         <CircleBtn label="سبد خرید" badge={cartCount} onClick={() => go("cart")}>
           <ShoppingBasket className="h-6 w-6" strokeWidth={2.4} />
         </CircleBtn>
       </div>
     ),
-    [cartCount, data?.settings?.appSlogan, go]
+    [cartCount, data?.settings, go]
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-brand-soft via-brand-soft to-[#f4a3c4]">
-      {/* موج تزئینی بالای صفحه */}
-      <div className="relative pointer-events-none" aria-hidden>
-        <Waves className="h-4 w-full text-white/50" />
-      </div>
-      <header className={showTopBar ? "" : "hidden"}>{topBar}</header>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#fbdcef] via-[#fad0e4] to-[#f8c4da]">
+      {!isHome && (
+        <div className="relative pointer-events-none" aria-hidden>
+          <Waves className="h-4 w-full text-white/50" />
+        </div>
+      )}
+      <header className={isHome ? "hidden" : ""}>{topBar}</header>
       <main className="flex-1 w-full max-w-md mx-auto px-4 pb-6 pt-1">{ViewRouter()}</main>
       {hideNav ? null : (
         <footer className="sticky bottom-0 z-40">

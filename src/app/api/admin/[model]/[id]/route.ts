@@ -6,7 +6,8 @@ const STRINGS = [
   "name", "title", "label", "shift", "icon", "code", "subtitle", "full", "receiver",
   "phone", "note", "image", "description", "badgeText", "appName", "appSlogan",
   "heroImage", "heroTitle", "heroSubtitle", "heroCtaText", "heroBadgeText",
-  "promoTitle", "promoSubtitle", "addressText", "workHours", "phone", "footerNote", "instagram", "role", "avatar", "fishName",
+  "logoImage", "promoImage", "promoLink",
+  "addressText", "workHours", "phone", "footerNote", "instagram", "role", "avatar", "fishName",
 ];
 const BOOLEANS = ["active", "isDefault"];
 const SKIPPED = ["id", "createdAt", "category", "favorites"];

@@ -225,25 +225,26 @@ const SETTINGS_GROUPS: { title: string; icon: LucideIcon; fields: FieldDef[] }[]
     fields: [
       { key: "appName", label: "نام اپلیکیشن", type: "text", required: true },
       { key: "appSlogan", label: "شعار", type: "text" },
+      { key: "logoImage", label: "لوگو (PNG)", type: "image" },
     ],
   },
   {
-    title: "بخش هیرو (بالای صفحه اصلی)",
+    title: "بخش هیرو (کاور بالای صفحه اصلی)",
     icon: ImageIcon,
     fields: [
-      { key: "heroImage", label: "تصویر هیرو", type: "image" },
-      { key: "heroBadgeText", label: "متن بج هیرو", type: "text", placeholder: "مثلاً ماهی و غذای دریایی" },
-      { key: "heroTitle", label: "تیتر هیرو", type: "text" },
-      { key: "heroSubtitle", label: "زیرتیتر هیرو", type: "text" },
-      { key: "heroCtaText", label: "متن دکمه هیرو", type: "text" },
+      { key: "heroImage", label: "عکس کاور (تمام‌عرض)", type: "image" },
+      { key: "heroBadgeText", label: "متن بج کاور", type: "text", placeholder: "مثلاً ماهی و غذای دریایی" },
+      { key: "heroTitle", label: "تیتر کاور", type: "text" },
+      { key: "heroSubtitle", label: "زیرتیتر کاور", type: "text" },
+      { key: "heroCtaText", label: "متن دکمه ثبت سفارش", type: "text" },
     ],
   },
   {
-    title: "بنر تبلیغاتی",
+    title: "بنر تبلیغاتی (فقط عکس)",
     icon: Tag,
     fields: [
-      { key: "promoTitle", label: "تیتر بنر", type: "text" },
-      { key: "promoSubtitle", label: "زیرتیتر بنر", type: "text" },
+      { key: "promoImage", label: "عکس بنر", type: "image" },
+      { key: "promoLink", label: "لینک کلیک (اختیاری)", type: "text", placeholder: "https://…" },
     ],
   },
   {

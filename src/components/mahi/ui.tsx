@@ -1,20 +1,30 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { faPrice, toFaDigits } from "@/lib/format";
-import { ChevronLeft, ChevronRight, Fish, Waves, Bell, ShoppingBasket, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Waves, Bell, ShoppingBasket, Heart } from "lucide-react";
+import { PiFish } from "react-icons/pi";
+import { useApp } from "./AppContext";
 import { useMahiStore } from "./store";
 
-/* ───────── لوگو ───────── */
+/* ───────── لوگو (داینامیک: لوگوی PNG ادمین یا نام متنی ماهی تنو) ───────── */
 export function MahiLogo({ size = "md", light = false }: { size?: "sm" | "md" | "lg"; light?: boolean }) {
   const s = size === "lg" ? "text-2xl" : size === "md" ? "text-xl" : "text-lg";
+  const { data } = useApp();
+  const settings = data?.settings;
+  if (settings?.logoImage) {
+    return (
+      <span className="relative inline-block h-11 w-24 select-none">
+        <Image src={settings.logoImage} alt={settings.appName || "ماهی تنو"} fill unoptimized className="object-contain" sizes="96px" />
+      </span>
+    );
+  }
   return (
     <span className="inline-flex items-center gap-1.5 select-none">
-      <span className="relative inline-flex items-center justify-center">
-        <Fish className={cn("text-brand", light && "text-white")} strokeWidth={2.6} aria-hidden />
-      </span>
+      <PiFish className={cn("h-6 w-6 text-brand", light && "text-white", size === "lg" && "h-7 w-7")} aria-hidden />
       <span className={cn("font-black tracking-tight text-brand", light && "text-white drop-shadow-[0_2px_0_rgba(168,20,87,.55)]", s)}>
-        ماهی‌یار
+        {settings?.appName || "ماهی تنو"}
       </span>
       <Waves className="h-3 w-8 text-teal-brand shrink-0" strokeWidth={2.4} aria-hidden />
     </span>
@@ -75,11 +85,10 @@ export function ScreenHeader({ title, action }: { title: string; action?: React.
 /* ───────── عنوان بخش (انواع ماهی ها) ───────── */
 export function SectionTitle({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("flex items-center justify-center gap-2", className)}>
-      <Fish className="h-5 w-5 text-brand" strokeWidth={2.6} aria-hidden />
+    <div className={cn("flex items-center justify-center gap-2.5", className)}>
+      <PiFish className="h-[22px] w-[22px] text-brand-deep -scale-x-100" aria-hidden />
       <span className="text-teal-deep font-extrabold text-lg">{children}</span>
-      <Waves className="h-4 w-10 text-brand-soft" strokeWidth={2.6} aria-hidden />
-      <span className="text-teal-deep font-extrabold text-lg opacity-0 hidden sm:inline">{""}</span>
+      <PiFish className="h-[22px] w-[22px] text-brand-deep" aria-hidden />
     </div>
   );
 }

@@ -41,7 +41,7 @@
   --radius-lg: var(--radius);
   --radius-xl: var(--radius) + 4px;
 
-  /* ─── پالت ماهی‌یار (مطابق موکاپ) ─── */
+  /* ─── پالت ماهی تنو (مطابق موکاپ) ─── */
   --color-brand: #ec407a;
   --color-brand-deep: #d81b60;
   --color-brand-dark: #ad1457;
@@ -60,7 +60,7 @@
 
 :root {
   --radius: 1.25rem;
-  --background: #f8bbd0;
+  --background: #fbdcef;
   --foreground: #4a154b;
   --card: #ffffff;
   --card-foreground: #4a154b;
@@ -157,7 +157,7 @@ input[type="number"] {
   scrollbar-width: none;
 }
 
-/* کارت استاندارد ماهی‌یار */
+/* کارت استاندارد ماهی تنو */
 .my-card {
   background: #ffffff;
   border-radius: 24px;
