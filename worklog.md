@@ -85,3 +85,27 @@ Work Log:
 Stage Summary:
 - App fully functional end-to-end; all 13 views + admin panel operational
 - Remaining known-good: cart persists via localStorage; favorites/orders live in DB; admin changes propagate instantly
+
+---
+Task ID: 5
+Agent: Main Coordinator (Z.ai Code)
+Task: GitHub repo creation + home page 13-point redesign + settings page pixel-perfect rebuild + logo/promo backend fields
+
+Work Log:
+- Extracted new Downloads.zip (7 mockups) → upload/design2/; VLM 3-phase analysis (top/mid/bottom crops at 1.6–2.6x zoom) of settings mockup (file_000000000f38824683e8b438bde0a501.png + photo_30732744324_x.jpg) and home mockup (photo_30732732866_x.jpg)
+- Settings mockup spec locked: beach-art header, frosted user card (avatar LEFT + crown + camera badge bottom-right, name/phone/edit-pill stacked, tagline+heart), 5 separate row cards (user/addresses/wallet/messages/appearance — filled pink icons in pale pink circles, dark-magenta titles, TEAL subtitles, pink chevrons), promo image, nav bar PINK (#f2b9ce→#c65f82 center, pixel-verified) not white
+- Schema: SiteSettings + logoImage/promoImage/promoLink; appName default «ماهی تنو»; db:push + data migration (heroImage=/assets/hero-bg.png, promoImage=/assets/promo-boat.png); seed updated
+- Admin API STRINGS + AdminView SETTINGS_GROUPS: لوگو (PNG) upload field, عکس بنر + لینک کلیک (اختیاری) — promo text fields removed from UI
+- Created MISSING /api/upload route (worklog Task 3 claimed it but file never existed — POST FormData → public/uploads, mime+size validation; e2e tested 201/400)
+- HomeView REWRITTEN: full-bleed cover (-mx-4, h-46vh, floating CircleBtns + logo/name, badge, big title, teal wave) + CTA pill (border-2 white, delicate PiFishSimple icon) overlapping bottom; features section bg #fff3f7 rounded-t-[28px] + CSS mask fade bottom; fish section #ffe7f0 rounded-[26px] + protruding pink tab title (PiFish mirrored both sides, bg #f6b6cf) + grid-cols-4 fish cards (aspect-video 16:9 img, 2-line name h-8, full-width سفارش btn) + white/45 bottom fade + subtle shadow; promo = plain image only (a-link if promoLink); 3 separate contact cards (icon top-LEFT via flex justify-end in RTL, filled lucide icons in brand-mist circles, مسیریابی/تماس buttons); footer
+- MahiYarApp Shell: lighter bg (#fbdcef→#f8c4da), header+waves hidden on home (cover full-bleed), mahi:open-drawer event wiring, Loader/Drawer rebranded ماهی تنو
+- BottomNav: PINK bar #f9c7da; Phosphor outline/filled icon pairs (PiGear/PiFish/PiHouse/PiClipboardText/PiUser + Fill variants); selected=filled brand-deep, unselected=outline brand-mid, both pink with labels; center home = droplet (borderRadius 50% 50% 42% 42%/64% 64% 36% 36%, h-64px w-56px, -mt-7, brand/brand-deep bg, NO white ring)
+- SettingsView REBUILT per mockup: beach illustration behind header (heroImage dynamic) + frosted bg-white/90 backdrop-blur user card (flex-row-reverse → avatar physical LEFT, PiCrownFill crown, PiCamera badge → real avatar upload /api/upload + PATCH /api/profile, ویرایش پروفایل pill, tagline), 5 rows exact mockup texts, promo image, 3 bottom sheets (wallet/messages w/ working notif Switch + sample messages/appearance زبان+تم)
+- ui.tsx: MahiLogo dynamic (logoImage PNG || appName text), SectionTitle with PiFish pair; MenuView image fill parent fix (relative); globals --background #fbdcef
+- GitHub: repo created via API → github.com/AbstractAxisX/mahi-tanou (public), 2 commits pushed, token scrubed from remote URL; .gitignore + .env/db/uploads/untracked
+- E2E agent-browser: home VLM QA (5/5 hero, 5/5 fish section, icons verified pink via DOM rect + pixel analysis — VLM misreads debunked), fish card→detail→extras/time/address/method→cart→ثبت نهایی→success→DB order persisted (205000 ✓ then cleaned), avatar upload e2e (persisted + displayed + reset), promo link e2e (admin save → home banner <a>), logo PNG e2e (upload→settings→home cover display→reset), notif switch localStorage, 3 sheets, sticky footer mobile+desktop (navBottom=winH, content 416px centered), 0 console errors/warnings after fixes, lint 0 errors
+
+Stage Summary:
+- Site renamed ماهی تنو; logo + cover + promo all admin-editable (PNG upload working)
+- Home page matches all 13 user feedback items; settings page matches mockup layout (beach header, frosted user card, 5 rows) with pink nav + droplet home
+- Repo live at github.com/AbstractAxisX/mahi-tanou
