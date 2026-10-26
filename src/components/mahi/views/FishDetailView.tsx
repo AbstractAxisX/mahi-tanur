@@ -355,7 +355,7 @@ export default function FishDetailView() {
                 value={receiver}
                 onChange={(e) => setReceiver(e.target.value)}
                 placeholder="نام و نام خانوادگی *"
-                className="flex-1 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
+                className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
               />
             </label>
             <label className="flex items-center gap-2 bg-white border-2 border-brand-soft rounded-2xl h-12 px-3 focus-within:border-brand transition-colors">
@@ -363,10 +363,11 @@ export default function FishDetailView() {
               <input
                 dir="ltr"
                 inputMode="tel"
+                maxLength={20}
                 value={receiverPhone}
                 onChange={(e) => setReceiverPhone(e.target.value)}
                 placeholder="شماره تماس *"
-                className="flex-1 bg-transparent outline-none text-[13px] font-bold text-ink text-left placeholder:text-grey/70 placeholder:font-normal placeholder:text-right"
+                className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink text-left tabular-nums placeholder:text-grey/70 placeholder:font-normal placeholder:text-right"
               />
             </label>
             <label className="flex items-center gap-2 bg-white border-2 border-brand-soft rounded-2xl h-12 px-3 focus-within:border-brand transition-colors">
@@ -375,7 +376,7 @@ export default function FishDetailView() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="توضیحات (اختیاری)"
-                className="flex-1 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
+                className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
               />
             </label>
           </div>

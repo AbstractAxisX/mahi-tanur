@@ -297,7 +297,7 @@ export default function AddressFormView() {
               <input
                 value={receiver}
                 onChange={(e) => setReceiver(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-[13px] font-bold text-ink"
+                className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink"
               />
             </span>
           </label>
@@ -307,9 +307,11 @@ export default function AddressFormView() {
               <Phone className="h-4 w-4 text-brand shrink-0" aria-hidden />
               <input
                 dir="ltr"
+                inputMode="tel"
+                maxLength={20}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-[13px] font-bold text-ink text-left tabular-nums"
+                className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink text-left tabular-nums"
               />
             </span>
           </label>
@@ -323,7 +325,7 @@ export default function AddressFormView() {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="مثلاً: زنگ تفریح، پلاک آبی"
-              className="flex-1 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
+              className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
             />
           </span>
         </label>

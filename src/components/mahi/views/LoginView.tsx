@@ -262,13 +262,14 @@ export default function LoginView() {
             <input
               dir="ltr"
               inputMode="tel"
+              maxLength={20}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") void submitLogin(); }}
               placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
               aria-label="شماره موبایل"
               autoComplete="tel"
-              className="flex-1 bg-transparent outline-none text-[14px] font-bold text-ink text-left placeholder:text-grey/80 placeholder:font-normal"
+              className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[14px] font-bold text-ink text-left tabular-nums placeholder:text-grey/80 placeholder:font-normal"
             />
           </label>
 
