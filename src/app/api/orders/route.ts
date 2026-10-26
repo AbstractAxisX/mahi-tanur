@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { Order } from "@prisma/client";
 import { db } from "@/lib/db";
 
 interface IncomingOrder {
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
     const items: IncomingOrder[] = Array.isArray(body) ? body : [body];
     if (!items.length) return NextResponse.json({ error: "empty order" }, { status: 400 });
 
-    const created = [];
+    const created: Order[] = [];
     for (const it of items) {
       if (!it.fishName || !it.receiver || !it.receiverPhone) continue;
       const extras = it.extras ?? [];

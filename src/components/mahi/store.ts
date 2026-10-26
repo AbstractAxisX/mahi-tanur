@@ -4,6 +4,15 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem, ViewName } from "@/lib/types";
 
+/** کاربر واردشده (مهمان = null) */
+export interface AuthUser {
+  id: string;
+  name: string;
+  phone: string;
+  avatar?: string | null;
+  role: string;
+}
+
 interface NavEntry {
   view: ViewName;
   params: Record<string, string>;
@@ -15,9 +24,11 @@ interface MahiState {
   stack: NavEntry[];
   cart: CartItem[];
   cartFlash: number;
+  authUser: AuthUser | null;
   go: (view: ViewName, params?: Record<string, string>) => void;
   back: () => void;
   setView: (view: ViewName, params?: Record<string, string>) => void;
+  setAuth: (user: AuthUser | null) => void;
   addToCart: (item: CartItem) => void;
   updateCartItem: (uid: string, patch: Partial<CartItem>) => void;
   removeFromCart: (uid: string) => void;
@@ -32,8 +43,11 @@ export const useMahiStore = create<MahiState>()(
       stack: [],
       cart: [],
       cartFlash: 0,
+      authUser: null,
 
       setView: (view, params = {}) => set({ view, params, stack: [] }),
+
+      setAuth: (user) => set({ authUser: user }),
 
       go: (view, params = {}) => {
         const { view: cur, params: curParams, stack } = get();
@@ -73,7 +87,7 @@ export const useMahiStore = create<MahiState>()(
     }),
     {
       name: "mahi-yar-cart",
-      partialize: (s) => ({ cart: s.cart }),
+      partialize: (s) => ({ cart: s.cart, authUser: s.authUser }),
     }
   )
 );

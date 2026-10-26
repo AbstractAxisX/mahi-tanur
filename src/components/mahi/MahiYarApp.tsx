@@ -6,9 +6,10 @@ import { useMahiStore } from "./store";
 import { AppProvider, useApp } from "./AppContext";
 import { MahiLogo, CircleBtn, DrawerItem } from "./ui";
 import { toFaDigits } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { PiFish, PiFishFill, PiHouse, PiHouseFill, PiClipboardText, PiClipboardTextFill, PiUser, PiUserFill, PiGear, PiGearFill } from "react-icons/pi";
-import { Waves, Home, Fish, ClipboardList, User, Settings as SettingsIcon, Menu as MenuIcon, ShoppingBasket, MapPin, Heart, LayoutGrid, X } from "lucide-react";
+import { Waves, Home, Fish, ClipboardList, User, Settings as SettingsIcon, Menu as MenuIcon, ShoppingBasket, MapPin, Heart, LayoutGrid, LogIn, X } from "lucide-react";
 
 import HomeView from "./views/HomeView";
 import MenuView from "./views/MenuView";
@@ -22,6 +23,7 @@ import AddressesView from "./views/AddressesView";
 import AddressFormView from "./views/AddressFormView";
 import FavoritesView from "./views/FavoritesView";
 import SettingsView from "./views/SettingsView";
+import LoginView from "./views/LoginView";
 
 const NAV = [
   { key: "settings", view: "settings" as const, label: "تنظیمات", outline: PiGear, filled: PiGearFill },
@@ -112,9 +114,8 @@ function BottomNav() {
 
 function DrawerMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const { go } = useMahiStore();
-  const { data } = useApp();
   const cartCount = useMahiStore((s) => s.cart.length);
-  const profile = data?.profile;
+  const authUser = useMahiStore((s) => s.authUser);
   const close = () => onOpenChange(false);
   const items: { icon: React.ReactNode; label: string; onClick: () => void; badge?: number }[] = [
     { icon: <Home />, label: "صفحه اصلی", onClick: () => { close(); go("home"); } },
@@ -124,7 +125,14 @@ function DrawerMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
     { icon: <MapPin />, label: "آدرس‌های من", onClick: () => { close(); go("addresses"); } },
     { icon: <Heart />, label: "علاقه‌مندی‌ها", onClick: () => { close(); go("favorites"); } },
     { icon: <SettingsIcon />, label: "تنظیمات", onClick: () => { close(); go("settings"); } },
-    { icon: <LayoutGrid />, label: "پنل مدیریت", onClick: () => { close(); go("admin"); } },
+    /* پنل مدیریت فقط برای مدیر */
+    ...(authUser?.role === "admin"
+      ? [{ icon: <LayoutGrid />, label: "پنل مدیریت", onClick: () => { close(); go("admin"); } }]
+      : []),
+    /* اگر وارد نشده — دعوت به ورود */
+    ...(authUser
+      ? []
+      : [{ icon: <LogIn />, label: "ورود / ثبت‌نام", onClick: () => { close(); go("login"); } }]),
   ];
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -139,9 +147,13 @@ function DrawerMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
           </div>
           <div className="flex items-start justify-between">
             <div className="relative z-10">
-              <p className="text-[13px] text-white/85">سلام {profile?.name || "کاربر"} عزیز 👋</p>
+              <p className="text-[13px] text-white/85">
+                {authUser ? `سلام ${authUser.name} عزیز 👋` : "مهمان عزیز 👋"}
+              </p>
               <p className="font-black text-lg leading-7 mt-0.5">عشق ماهی، عشق تازگی</p>
-              <p className="text-[11px] text-white/80 mt-1">{toFaDigits(profile?.phone || "")}</p>
+              <p dir="ltr" className="text-right text-[11px] text-white/80 mt-1 tabular-nums">
+                {authUser?.phone ? toFaDigits(authUser.phone) : "برای ثبت سفارش وارد شو"}
+              </p>
             </div>
             <button type="button" onClick={close} aria-label="بستن" className="h-8 w-8 rounded-full bg-white/20 grid place-items-center">
               <X className="h-4 w-4" />
@@ -169,6 +181,7 @@ function ViewRouter() {
     case "fish": return <FishDetailView />;
     case "cart": return <CartView />;
     case "success": return <SuccessView />;
+    case "login": return <LoginView />;
     case "profile": return <ProfileView />;
     case "orders": return <OrdersView />;
     case "order-detail": return <OrderDetailView />;
@@ -202,8 +215,9 @@ function Shell() {
   const { data } = useApp();
   const [drawer, setDrawer] = useState(false);
   const cartCount = useMahiStore((s) => s.cart.length);
-  const isHome = view === "home";
-  const hideNav = view === "fish" || view === "cart";
+  /* صفحه‌های all-screen: کاور خانه + ورود (بدون هدر) */
+  const immersive = view === "home" || view === "login";
+  const hideNav = view === "fish" || view === "cart" || view === "login";
 
   /* باز شدن منوی کشویی از دکمه شناور روی کاور صفحه اصلی */
   useEffect(() => {
@@ -242,13 +256,20 @@ function Shell() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#fbdcef] via-[#fad0e4] to-[#f8c4da]">
-      {!isHome && (
+      {!immersive && (
         <div className="relative pointer-events-none" aria-hidden>
           <Waves className="h-4 w-full text-white/50" />
         </div>
       )}
-      <header className={isHome ? "hidden" : ""}>{topBar}</header>
-      <main className="flex-1 w-full max-w-md mx-auto px-4 pb-6 pt-1">{ViewRouter()}</main>
+      <header className={immersive ? "hidden" : ""}>{topBar}</header>
+      <main
+        className={cn(
+          "flex-1 w-full max-w-md mx-auto px-4 pb-6 pt-1",
+          view === "login" && "px-0 pt-0 pb-0"
+        )}
+      >
+        {ViewRouter()}
+      </main>
       {hideNav ? null : (
         <footer className="sticky bottom-0 z-40">
           <BottomNav />

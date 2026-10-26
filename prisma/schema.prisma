@@ -37,21 +37,6 @@ model FishCategory {
   fishes Fish[]
 }
 
-// ─── انواع ماهی ───
-model Fish {
-  id          String       @id @default(cuid())
-  name        String
-  image       String
-  description String
-  price       Int // تومان - قیمت هر عدد ماهی
-  badgeText   String?
-  categoryId  String
-  category    FishCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  active      Boolean      @default(true)
-  order       Int          @default(0)
-  favorites   Favorite[]
-}
-
 // ─── حَشو (گزینه‌های اختیاری با قیمت خودشان) ───
 model Extra {
   id     String  @id @default(cuid())
@@ -84,14 +69,31 @@ model DeliveryMethod {
   order    Int     @default(0)
 }
 
-// ─── پروفایل کاربر (تک‌کاربر) ───
-model Profile {
-  id     String  @id @default(cuid())
-  name   String  @default("احسان")
-  phone  String  @default("۰۹۱۲۱۴۴۹۰۵۴")
-  avatar String?
-  role   String  @default("کاربر عالی")
-  note   String  @default("عشق ماهی، عشق تازگی")
+// ─── کاربران (ورود فقط با اسم + شماره؛ مهمان پیش‌فرض) ───
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique // شماره موبایل — کلید ورود (بدون رمز و کد)
+  avatar    String?
+  role      String   @default("user") // user | admin
+  createdAt DateTime @default(now())
+}
+
+// ─── انواع ماهی ───
+model Fish {
+  id          String       @id @default(cuid())
+  name        String
+  image       String
+  description String
+  price       Int // تومان - قیمت هر عدد ماهی
+  badgeText   String?
+  inStock     Boolean      @default(true) // موجود / ناموجود (از پنل ادمین)
+  categoryId  String
+  category    FishCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  active      Boolean      @default(true)
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  favorites   Favorite[]
 }
 
 // ─── آدرس‌های ذخیره‌شده ───

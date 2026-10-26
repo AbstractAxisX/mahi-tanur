@@ -7,7 +7,7 @@ import { useMahiStore } from "../store";
 import { ScreenHeader, PillBtn } from "../ui";
 import { faPrice, toFaDigits } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Order } from "@/lib/types";
+import type { TOrder } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import {
@@ -70,7 +70,7 @@ export default function CartView() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("failed");
-      const created = (await res.json()) as Order[];
+      const created = (await res.json()) as TOrder[];
       clearCart();
       window.dispatchEvent(new CustomEvent("mahi:refresh"));
       go("success", { orders: JSON.stringify(created) });

@@ -1,11 +1,11 @@
-import { Fish, FishCategory, Extra, TimeSlot, DeliveryMethod, Profile, Address, Order, SiteSettings } from "@prisma/client";
+import { Fish, FishCategory, Extra, TimeSlot, DeliveryMethod, User, Address, Order, SiteSettings } from "@prisma/client";
 
 export type TFish = Fish;
 export type TCategory = FishCategory;
 export type TExtra = Extra;
 export type TTimeSlot = TimeSlot;
 export type TDeliveryMethod = DeliveryMethod;
-export type TProfile = Profile;
+export type TUser = User;
 export type TAddress = Address;
 export type TOrder = Order;
 export type TSettings = SiteSettings;
@@ -16,7 +16,6 @@ export interface AppBoot {
   extras: TExtra[];
   timeSlots: TTimeSlot[];
   deliveryMethods: TDeliveryMethod[];
-  profile: TProfile;
   addresses: TAddress[];
   favorites: string[]; // fishIds
   orders: TOrder[];
@@ -58,6 +57,7 @@ export type ViewName =
   | "fish"
   | "cart"
   | "success"
+  | "login"
   | "profile"
   | "orders"
   | "order-detail"

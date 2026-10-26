@@ -22,13 +22,14 @@ const TITLES = [
 export default function AddressFormView() {
   const { data, refresh } = useApp();
   const { params, go, back } = useMahiStore();
+  const authUser = useMahiStore((s) => s.authUser);
   const { toast } = useToast();
 
   const editing = data?.addresses?.find((a) => a.id === params.addressId) ?? null;
   const [title, setTitle] = useState(editing?.title ?? "خانه");
   const [full, setFull] = useState(editing?.full ?? "");
-  const [receiver, setReceiver] = useState(editing?.receiver ?? data?.profile?.name ?? "");
-  const [phone, setPhone] = useState(editing?.phone ?? data?.profile?.phone ?? "");
+  const [receiver, setReceiver] = useState(editing?.receiver ?? authUser?.name ?? "");
+  const [phone, setPhone] = useState(editing?.phone ?? authUser?.phone ?? "");
   const [note, setNote] = useState("");
   const [isDefault, setIsDefault] = useState(editing?.isDefault ?? (data?.addresses ?? []).length === 0);
 

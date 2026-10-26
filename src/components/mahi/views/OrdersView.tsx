@@ -5,11 +5,11 @@ import { useMemo, useState } from "react";
 import { useApp } from "../AppContext";
 import { useMahiStore } from "../store";
 import { ScreenHeader, StatusBadge } from "../ui";
-import { faPrice, toFaDigits, faDateTime } from "@/lib/format";
+import { faPrice, toFaDigits, toEnDigits, faDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { TOrder } from "@/lib/types";
 import { motion } from "framer-motion";
-import { ClipboardList, ChevronLeft, Clock, Fish as FishIcon } from "lucide-react";
+import { ClipboardList, ChevronLeft, Clock, Fish as FishIcon, LogIn } from "lucide-react";
 
 const FILTERS = [
   { key: "all", label: "همه" },
@@ -19,13 +19,44 @@ const FILTERS = [
 
 export default function OrdersView() {
   const { data } = useApp();
-  const { go } = useMahiStore();
+  const go = useMahiStore((s) => s.go);
+  const authUser = useMahiStore((s) => s.authUser);
   const [filter, setFilter] = useState("all");
 
+  const isAdmin = authUser?.role === "admin";
+
+  /* سفارش‌های کاربر = سفارش‌هایی که با شماره او ثبت شده‌اند (نرمال‌سازی ارقام فارسی/انگلیسی) */
   const orders = useMemo(() => {
     const all = data?.orders ?? [];
-    return filter === "all" ? all : all.filter((o) => o.status === filter);
-  }, [data?.orders, filter]);
+    const mine = !authUser || isAdmin ? all : all.filter((o) => toEnDigits(o.receiverPhone) === toEnDigits(authUser.phone));
+    return filter === "all" ? mine : mine.filter((o) => o.status === filter);
+  }, [data?.orders, filter, authUser, isAdmin]);
+
+  /* مهمان: دعوت به ورود */
+  if (!authUser) {
+    return (
+      <div>
+        <ScreenHeader title="سفارش‌های من" action={<span className="h-11 w-11 grid place-items-center rounded-full bg-white/60"><ClipboardList className="h-6 w-6 text-brand" aria-hidden /></span>} />
+        <div className="my-card p-8 text-center">
+          <span className="mx-auto h-16 w-16 rounded-full bg-brand-mist grid place-items-center">
+            <LogIn className="h-8 w-8 text-brand" aria-hidden />
+          </span>
+          <p className="mt-4 text-[15px] font-black text-ink">برای دیدن سفارش‌هات وارد شو</p>
+          <p className="mt-1.5 text-[12px] font-bold text-grey leading-5">
+            سفارش‌هایی که با شماره‌ات ثبت کنی، اینجا جمع می‌شن
+          </p>
+          <button
+            type="button"
+            onClick={() => go("login")}
+            className="mt-5 w-full h-12 rounded-full bg-brand text-white text-[15px] font-black flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(236,64,122,.4)] active:scale-[.98] transition-transform"
+          >
+            <LogIn className="h-5 w-5" aria-hidden />
+            ورود / ثبت‌نام
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -53,7 +84,9 @@ export default function OrdersView() {
         {orders.length === 0 && (
           <div className="my-card p-8 text-center text-grey">
             <FishIcon className="mx-auto h-10 w-10 text-brand-soft" aria-hidden />
-            <p className="mt-2 text-[13px] font-bold">سفارشی با این وضعیت نیست</p>
+            <p className="mt-2 text-[13px] font-bold">
+              {isAdmin ? "هنوز سفارشی ثبت نشده" : "سفارشی با این وضعیت نیست"}
+            </p>
           </div>
         )}
         {orders.map((o: TOrder, i) => (

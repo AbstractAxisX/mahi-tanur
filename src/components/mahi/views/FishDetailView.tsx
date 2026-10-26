@@ -19,6 +19,7 @@ import {
 export default function FishDetailView() {
   const { data } = useApp();
   const { go, params, addToCart } = useMahiStore();
+  const authUser = useMahiStore((s) => s.authUser);
   const existingCartTotal = useMahiStore((s) => s.cart.reduce((sum, c) => sum + c.total, 0));
   const { toast } = useToast();
 
@@ -38,10 +39,13 @@ export default function FishDetailView() {
   const [timeId, setTimeId] = useState<string | null>(null);
   const [methodCode, setMethodCode] = useState<string | null>(null);
   const [addressId, setAddressId] = useState<string | null>(defaultAddress?.id ?? null);
-  const [receiver, setReceiver] = useState(data?.profile?.name ?? "");
-  const [receiverPhone, setReceiverPhone] = useState(data?.profile?.phone ?? "");
+  const [receiver, setReceiver] = useState(authUser?.name ?? "");
+  const [receiverPhone, setReceiverPhone] = useState(authUser?.phone ?? "");
   const [note, setNote] = useState("");
   const [addrSheet, setAddrSheet] = useState(false);
+
+  /* این ماهی فعلاً ناموجود است؟ */
+  const outOfStock = fish?.inStock === false;
 
   if (!fish) {
     return (
@@ -68,6 +72,7 @@ export default function FishDetailView() {
     setSelExtras((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   const submit = () => {
+    if (outOfStock) return toast({ title: "این ماهی فعلاً ناموجوده 🚫", description: "به‌محض موجود شدن، دوباره سراغش بیا!" });
     if (!chosenTime) return toast({ title: "زمان تحویل را انتخاب کنید", description: "یکی از دو بازهٔ ظهر یا عصر را انتخاب کنید." });
     if (!chosenMethod) return toast({ title: "روش دریافت کالا را انتخاب کنید" });
     if (!chosenAddress) return toast({ title: "آدرس تحویل را انتخاب کنید", description: "از کارت «محل تحویل» یک آدرس انتخاب کنید." });
@@ -107,6 +112,21 @@ export default function FishDetailView() {
       <ScreenHeader title={fish.name} action={<span className="h-11 w-11 grid place-items-center rounded-full bg-white/60"><FishIcon className="h-6 w-6 text-brand" aria-hidden /></span>} />
 
       <div className="space-y-3.5">
+        {/* ───── بنر ناموجود بودن ───── */}
+        {outOfStock && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-[18px] border-2 border-rose-200 bg-rose-50 px-4 py-3 flex items-center gap-2.5"
+            role="alert"
+          >
+            <span className="h-9 w-9 shrink-0 rounded-full bg-rose-400 text-white grid place-items-center">
+              <FishIcon className="h-5 w-5" aria-hidden />
+            </span>
+            <p className="text-[13px] font-black text-rose-500 leading-5">این ماهی فعلاً ناموجوده 🚫 — بزودی برمی‌گرده!</p>
+          </motion.div>
+        )}
+
         {/* ───── کارت محصول (عکس ۱۶:۹ + نام + توضیحات — عمودی و خوانا) ───── */}
         <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="my-card p-3.5">
           {/* عکس تمام‌عرض ۱۶:۹ با گوشه گرد */}
@@ -379,10 +399,14 @@ export default function FishDetailView() {
         <button
           type="button"
           onClick={submit}
-          className="mt-3 w-full h-14 rounded-full bg-teal-brand text-white text-[16px] font-black flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(0,172,193,.45)] active:scale-[.98] transition-transform"
+          disabled={outOfStock}
+          className={cn(
+            "mt-3 w-full h-14 rounded-full bg-teal-brand text-white text-[16px] font-black flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(0,172,193,.45)] active:scale-[.98] transition-transform",
+            outOfStock && "opacity-50 pointer-events-none"
+          )}
         >
           <Send className="h-5 w-5 -scale-x-100" aria-hidden />
-          ثبت سفارش نهایی
+          {outOfStock ? "فعلاً ناموجوده" : "ثبت سفارش نهایی"}
           <ChevronLeft className="h-5 w-5" strokeWidth={3} aria-hidden />
         </button>
       </div>

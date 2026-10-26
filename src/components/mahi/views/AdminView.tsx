@@ -7,11 +7,12 @@ import type { LucideIcon } from "lucide-react";
 import {
   Settings as SettingsIcon, LayoutGrid, Fish as FishIcon, Salad, Clock, Truck, ClipboardList,
   Plus, Pencil, Trash2, Upload, Loader2, Image as ImageIcon, Sun, Moon, Home as HomeIcon,
-  Navigation, ShieldCheck, Store, Tag, Phone as PhoneIcon, Info as InfoIcon, Check,
+  Navigation, ShieldCheck, ShieldOff, Store, Tag, Phone as PhoneIcon, Info as InfoIcon, Check,
   MapPin, Copy, ChevronDown, ExternalLink,
 } from "lucide-react";
 
 import { ScreenHeader, PillBtn, CardTitle, StatusBadge } from "../ui";
+import { useMahiStore } from "../store";
 import { cn } from "@/lib/utils";
 import { faPrice, toFaDigits, faDateTime } from "@/lib/format";
 import { osmEmbedUrl } from "@/lib/geo";
@@ -180,6 +181,7 @@ function fieldsFor(tab: EntityTab, cats: AdminRecord[]): FieldDef[] {
         { key: "description", label: "توضیحات", type: "textarea", placeholder: "توضیح کوتاه درباره این ماهی…" },
         { key: "price", label: "قیمت هر عدد (تومان)", type: "number", required: true, placeholder: "مثلاً 195000" },
         { key: "badgeText", label: "متن بج (اختیاری)", type: "text", placeholder: "مثلاً پیشنهاد ویژه" },
+        { key: "inStock", label: "موجود است", type: "switch", def: true },
         {
           key: "categoryId", label: "دسته‌بندی", type: "select", required: true,
           options: cats.map((c) => ({ value: c.id, label: rv.str(c, "name") || "بدون نام" })),
@@ -477,7 +479,7 @@ function FieldInput({
 /* ═══════════════════════ کارت آیتم (تب‌های موجودیت) ═══════════════════════ */
 
 function EntityCard({
-  tab, rec, catName, index, onEdit, onDelete, onToggle,
+  tab, rec, catName, index, onEdit, onDelete, onToggle, onToggleStock,
 }: {
   tab: EntityTab;
   rec: AdminRecord;
@@ -486,10 +488,12 @@ function EntityCard({
   onEdit: () => void;
   onDelete: () => void;
   onToggle: () => void;
+  onToggleStock?: () => void;
 }) {
   const mainKey = tab === "timeslots" ? "label" : tab === "delivery-methods" ? "title" : "name";
   const name = rv.str(rec, mainKey);
   const active = rec.active === true;
+  const inStock = rec.inStock !== false;
   const order = rv.num(rec, "order");
   const price = rv.num(rec, "price");
   const image = rv.str(rec, "image");
@@ -534,6 +538,16 @@ function EntityCard({
           >
             {active ? "فعال" : "غیرفعال"}
           </span>
+          {tab === "fish" ? (
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.5 text-[9.5px] font-black shrink-0",
+                inStock ? "bg-teal-brand text-white" : "bg-rose-500 text-white"
+              )}
+            >
+              {inStock ? "موجود" : "ناموجود"}
+            </span>
+          ) : null}
         </div>
         <div className="mt-1 flex items-center gap-1.5 flex-wrap text-[11px] font-bold text-grey">
           {tab === "fish" ? (
@@ -559,6 +573,21 @@ function EntityCard({
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
+        {tab === "fish" && onToggleStock ? (
+          <button
+            type="button"
+            onClick={onToggleStock}
+            aria-label={inStock ? `ناموجود کردن ${name}` : `موجود کردن ${name}`}
+            title={inStock ? "ناموجود کردن" : "موجود کردن"}
+            className={cn(
+              "inline-flex items-center gap-1 h-9 px-2.5 rounded-full text-[10.5px] font-black active:scale-90 transition-transform",
+              inStock ? "bg-teal-mist text-teal-deep" : "bg-rose-50 text-rose-500"
+            )}
+          >
+            {inStock ? <Check className="h-3.5 w-3.5" aria-hidden /> : <ShieldOff className="h-3.5 w-3.5" aria-hidden />}
+            {inStock ? "موجود" : "ناموجود"}
+          </button>
+        ) : null}
         <Switch checked={active} onCheckedChange={onToggle} aria-label={active ? `غیرفعال‌کردن ${name}` : `فعال‌کردن ${name}`} />
         <button
           type="button"
@@ -775,6 +804,43 @@ function OrderCard({
 
 export default function AdminView() {
   const { toast } = useToast();
+  const authUser = useMahiStore((s) => s.authUser);
+  const go = useMahiStore((s) => s.go);
+
+  /* ─── دروازه دسترسی: فقط مدیر ─── */
+  if (authUser?.role !== "admin") {
+    return (
+      <div className="pb-2">
+        <ScreenHeader
+          title="پنل مدیریت"
+          action={
+            <span className="h-11 w-11 grid place-items-center rounded-full bg-white/60">
+              <ShieldOff className="h-6 w-6 text-brand" aria-hidden />
+            </span>
+          }
+        />
+        <div className="my-card p-8 text-center mt-3">
+          <span className="mx-auto h-20 w-20 rounded-full bg-brand-mist grid place-items-center">
+            <ShieldOff className="h-10 w-10 text-brand-deep" aria-hidden />
+          </span>
+          <p className="mt-4 text-[17px] font-black text-ink">دسترسی فقط برای مدیر</p>
+          <p className="mt-1.5 text-[12.5px] font-bold text-grey leading-5">
+            برای ورود به پنل مدیریت، با حساب مدیر وارد شو
+          </p>
+          <PillBtn className="mt-5 h-12 px-8" onClick={() => go("login")}>
+            <ShieldCheck className="h-5 w-5" aria-hidden />
+            ورود مدیر
+          </PillBtn>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminPanel />;
+}
+
+function AdminPanel() {
+  const { toast } = useToast();
   const [tab, setTab] = useState<TabKey>("settings");
   const [loading, setLoading] = useState(true);
   const [lists, setLists] = useState<Partial<Record<TabKey, AdminRecord[]>>>({});
@@ -854,6 +920,23 @@ export default function AdminView() {
       refreshApp();
     } catch (e) {
       toast({ title: "تغییر وضعیت ناموفق بود", description: errMsg(e) });
+    }
+  };
+
+  /* تغییر سریع موجود / ناموجود (تب ماهی‌ها) */
+  const toggleInStock = async (rec: AdminRecord) => {
+    const next = rec.inStock === false; // اگر ناموجود بود → موجود کن
+    try {
+      await fetchJson(`/api/admin/fish/${rec.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inStock: next }),
+      });
+      toast({ title: next ? "موجود شد ✅" : "ناموجود شد" });
+      bump();
+      refreshApp();
+    } catch (e) {
+      toast({ title: "تغییر موجودی ناموفق بود", description: errMsg(e) });
     }
   };
 
@@ -1111,6 +1194,7 @@ export default function AdminView() {
                     onEdit={() => openEdit(rec)}
                     onDelete={() => setDelTarget(rec)}
                     onToggle={() => void toggleActive(rec)}
+                    onToggleStock={tab === "fish" ? () => void toggleInStock(rec) : undefined}
                   />
                 ))}
               </div>

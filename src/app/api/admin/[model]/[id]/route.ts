@@ -9,7 +9,7 @@ const STRINGS = [
   "logoImage", "promoImage", "promoLink",
   "addressText", "workHours", "phone", "footerNote", "instagram", "role", "avatar", "fishName",
 ];
-const BOOLEANS = ["active", "isDefault"];
+const BOOLEANS = ["active", "isDefault", "inStock"];
 const SKIPPED = ["id", "createdAt", "category", "favorites"];
 
 function pick(body: Record<string, unknown>) {
@@ -56,8 +56,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ mo
       case "addresses":
         if (data.isDefault === true) await db.address.updateMany({ data: { isDefault: false } });
         return NextResponse.json(await db.address.update({ where: { id }, data }));
-      case "profile":
-        return NextResponse.json(await db.profile.update({ where: { id }, data }));
       default:
         return NextResponse.json({ error: "unknown model" }, { status: 404 });
     }

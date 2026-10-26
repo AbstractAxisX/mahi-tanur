@@ -19,7 +19,9 @@ type SheetKind = null | "wallet" | "messages" | "appearance";
 
 export default function SettingsView() {
   const { data, refresh } = useApp();
-  const { go, back } = useMahiStore();
+  const go = useMahiStore((s) => s.go);
+  const authUser = useMahiStore((s) => s.authUser);
+  const setAuth = useMahiStore((s) => s.setAuth);
   const { toast } = useToast();
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [notif, setNotif] = useState(() => {
@@ -31,7 +33,6 @@ export default function SettingsView() {
   });
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const profile = data?.profile;
   const settings = data?.settings;
 
   const toggleNotif = (v: boolean) => {
@@ -42,8 +43,9 @@ export default function SettingsView() {
     toast({ title: v ? "اعلان‌ها روشن شد 🔔" : "اعلان‌ها خاموش شد", description: v ? "خبر شروع سفارش‌های ویژه می‌رسد!" : "هر وقت خواستی از همین‌جا روشنش کن" });
   };
 
-  /* آپلود آواتار جدید (بج دوربین روی عکس پروفایل) */
+  /* آپلود آواتار جدید (بج دوربین روی عکس پروفایل) — فقط برای کاربر واردشده */
   const changeAvatar = async (file: File) => {
+    if (!authUser) return;
     if (file.size > 8 * 1024 * 1024) {
       toast({ title: "حجم تصویر زیاد است", description: "حداکثر حجم مجاز ۸ مگابایت است" });
       return;
@@ -55,11 +57,17 @@ export default function SettingsView() {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       if (!res.ok) throw new Error();
       const { url } = (await res.json()) as { url: string };
-      await fetch("/api/profile", {
+      const saveRes = await fetch("/api/auth/user", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar: url }),
+        body: JSON.stringify({ userId: authUser.id, avatar: url }),
       });
+      const json = (await saveRes.json()) as {
+        user?: { id: string; name: string; phone: string; avatar?: string | null; role: string };
+        error?: string;
+      };
+      if (!saveRes.ok || !json.user) throw new Error(json.error || "ذخیره انجام نشد");
+      setAuth(json.user);
       await refresh();
       window.dispatchEvent(new Event("mahi:refresh"));
       toast({ title: "عکس پروفایل عوض شد ✨" });
@@ -122,55 +130,70 @@ export default function SettingsView() {
             className="rounded-[24px]  bg-white/90 backdrop-blur-md p-4 shadow-[0_8px_28px_rgba(168,20,87,.22)]"
           >
         <div className="flex flex-row-reverse items-center gap-4 ">
-          {/* آواتار با تاج و بج دوربین */}
+          {/* آواتار با تاج و بج دوربین (دوربین فقط برای کاربر واردشده) */}
           <div className="relative shrink-0">
             <PiCrownFill className="absolute -top-2.5 right-3 h-5 w-5 text-[#f4a740] drop-shadow-[0_1px_2px_rgba(0,0,0,.2)] z-10" aria-hidden />
             <span className="block h-[90px] w-[90px] rounded-full overflow-hidden border-[3px] border-white ring-2 ring-brand-mist shadow-[0_4px_12px_rgba(236,64,122,.2)] bg-brand-faint">
-              {profile?.avatar ? (
-                <Image src={profile.avatar} alt={profile?.name || "کاربر"} width={78} height={78} unoptimized className="h-full w-full object-cover" />
+              {authUser?.avatar ? (
+                <Image src={authUser.avatar} alt={authUser?.name || "کاربر"} width={78} height={78} unoptimized className="h-full w-full object-cover" />
               ) : (
-                <Image src="/assets/avatar-fish.png" alt={profile?.name || "کاربر"} width={78} height={78} className="h-full w-full object-cover" />
+                <Image src="/assets/avatar-fish.png" alt={authUser?.name || "مهمان"} width={78} height={78} className="h-full w-full object-cover" />
               )}
             </span>
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              aria-label="تغییر عکس پروفایل"
-              disabled={uploading}
-              className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-brand text-white grid place-items-center shadow-[0_3px_8px_rgba(236,64,122,.4)] active:scale-90 transition-transform z-10"
-            >
-              <PiCamera className={`h-[18px] w-[18px] ${uploading ? "animate-pulse" : ""}`} aria-hidden />
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="sr-only"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) changeAvatar(f);
-                e.target.value = "";
-              }}
-            />
+            {authUser ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  aria-label="تغییر عکس پروفایل"
+                  disabled={uploading}
+                  className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-brand text-white grid place-items-center shadow-[0_3px_8px_rgba(236,64,122,.4)] active:scale-90 transition-transform z-10"
+                >
+                  <PiCamera className={`h-[18px] w-[18px] ${uploading ? "animate-pulse" : ""}`} aria-hidden />
+                </button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="sr-only"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) changeAvatar(f);
+                    e.target.value = "";
+                  }}
+                />
+              </>
+            ) : null}
           </div>
 
-          {/* نام، شماره، دکمه ویرایش */}
+          {/* نام، شماره، دکمه ویرایش/ورود */}
           <div className="flex-1 min-w-0 text-right">
             <p className="text-[17px] font-black text-ink inline-flex items-center gap-1.5">
-              {profile?.name || "کاربر"}
+              {authUser?.name || "مهمان"}
               <PiCrownFill className="h-4 w-4 text-brand" aria-hidden />
             </p>
             <p dir="ltr" className="text-right text-[13px] font-bold text-grey tabular-nums mt-0.5">
-              {toFaDigits(profile?.phone || "")}
+              {authUser?.phone ? toFaDigits(authUser.phone) : "برای ثبت سفارش وارد شو"}
             </p>
-            <button
-              type="button"
-              onClick={() => go("profile")}
-              className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand text-white text-[12px] font-bold px-4 h-9 shadow-[0_4px_12px_rgba(236,64,122,.35)] active:scale-95 transition-transform"
-            >
-              <PiPencilSimple className="h-4 w-4" aria-hidden />
-              ویرایش پروفایل
-            </button>
+            {authUser ? (
+              <button
+                type="button"
+                onClick={() => go("profile")}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand text-white text-[12px] font-bold px-4 h-9 shadow-[0_4px_12px_rgba(236,64,122,.35)] active:scale-95 transition-transform"
+              >
+                <PiPencilSimple className="h-4 w-4" aria-hidden />
+                ویرایش پروفایل
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => go("login")}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand text-white text-[12px] font-bold px-4 h-9 shadow-[0_4px_12px_rgba(236,64,122,.35)] active:scale-95 transition-transform"
+              >
+                <PiUser className="h-4 w-4" aria-hidden />
+                ورود / ثبت‌نام
+              </button>
+            )}
           </div>
         </div>
 

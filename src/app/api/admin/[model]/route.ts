@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-const KNOWN = ["categories", "fish", "extras", "timeslots", "delivery-methods", "settings", "orders", "addresses", "profile"] as const;
+const KNOWN = ["categories", "fish", "extras", "timeslots", "delivery-methods", "settings", "orders", "addresses"] as const;
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ model: string }> }) {
   const { model } = await params;
@@ -24,8 +24,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ mod
       return NextResponse.json(await db.order.findMany({ orderBy: { createdAt: "desc" } }));
     case "addresses":
       return NextResponse.json(await db.address.findMany({ orderBy: { createdAt: "desc" } }));
-    case "profile":
-      return NextResponse.json(await db.profile.findFirst());
     default:
       return NextResponse.json({ error: "unknown model" }, { status: 404 });
   }

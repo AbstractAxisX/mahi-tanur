@@ -113,6 +113,7 @@ async function main() {
       description: "سالمون تازه با لیمو عمانی و کره گیاهی؛ برای کسانی که طعم‌های خاص را می‌شناسند.",
       price: 320000,
       badgeText: "ویژه",
+      inStock: false, // نمونه ناموجود — برای نمایش قابلیت موجود/ناموجود
       category: "سالمون",
       order: 6,
     },
@@ -179,13 +180,13 @@ async function main() {
     else await db.deliveryMethod.create({ data: d });
   }
 
-  // ── پروفایل ──
-  const profileCount = await db.profile.count();
-  if (profileCount === 0) {
-    await db.profile.create({
-      data: { name: "احسان", phone: "۰۹۱۲۱۴۴۹۰۵۴", role: "کاربر عالی", note: "عشق ماهی، عشق تازگی" },
-    });
-  }
+  // ── کاربران (ورود فقط با اسم + شماره) ──
+  // شماره‌ها با ارقام انگلیسی ذخیره می‌شوند تا تطبیق سفارش‌ها (receiverPhone) درست کار کند
+  await db.user.upsert({
+    where: { phone: "09121449054" },
+    update: { name: "احسان", role: "user" },
+    create: { name: "احسان", phone: "09121449054", role: "user" },
+  });
 
   // ── آدرس‌های ذخیره‌شده ──
   const addrDefs = [

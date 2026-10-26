@@ -5,13 +5,13 @@ import { useMemo } from "react";
 import { useMahiStore } from "../store";
 import { PillBtn, MahiLogo } from "../ui";
 import { faPrice, toFaDigits } from "@/lib/format";
-import type { Order } from "@/lib/types";
+import type { TOrder } from "@/lib/types";
 import { motion } from "framer-motion";
 import { CheckCircle2, Waves, ClipboardList, Home as HomeIcon, PartyPopper } from "lucide-react";
 
 export default function SuccessView() {
   const { params, go } = useMahiStore();
-  const orders = useMemo<Order[]>(() => {
+  const orders = useMemo<TOrder[]>(() => {
     try {
       return JSON.parse(params.orders || "[]");
     } catch {
