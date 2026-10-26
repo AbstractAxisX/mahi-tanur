@@ -22,7 +22,7 @@ log "بررسی/نصب پیش‌نیازها"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y -qq
 
-if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -dv -f1 | cut -d. -f1)" -lt 20 ]; then
+if ! command -v node >/dev/null 2>&1 || [ "$(node -v | tr -d 'v' | cut -d. -f1)" -lt 20 ]; then
   log "نصب Node.js $NODE_MAJOR (NodeSource)"
   apt-get install -y -qq ca-certificates curl gnupg
   mkdir -p /etc/apt/keyrings
@@ -54,12 +54,16 @@ log "دریافت کد از گیت‌هاب"
 mkdir -p /var/www
 if [ -d "$APP_DIR/.git" ]; then
   cd "$APP_DIR" && git fetch --all --quiet && git reset --hard origin/main --quiet
+elif git clone --depth 1 "$REPO" "$APP_DIR" 2>/dev/null; then
+  cd "$APP_DIR"
 else
-  rm -rf "$APP_DIR"
-  git clone --depth 1 "$REPO" "$APP_DIR"
+  # اگر گیت‌هاب در دسترس نبود، از تاربال آپلودشده استفاده کن
+  log "گیت‌هاب در دسترس نبود — استخراج تاربال آپلودی"
+  rm -rf "$APP_DIR" && mkdir -p "$APP_DIR"
+  tar -xzf /root/mahi-tanur.tar.gz -C "$APP_DIR"
   cd "$APP_DIR"
 fi
-git log --oneline -1
+git log --oneline -1 2>/dev/null || echo "(deploy from tarball)"
 
 # ─────────────────────────── ۳) نصب پکیج‌ها ───────────────────────────
 log "نصب پکیج‌ها (npm)"
@@ -162,7 +166,7 @@ log "تنظیم کرون بکاپ (هر ۶ ساعت + نگهداری ۱۴ نسخ
 chmod +x scripts/*.sh
 CRON_LINE="0 */6 * * * root $APP_DIR/scripts/backup.sh $APP_DIR >> $APP_DIR/backups/backup.log 2>&1"
 mkdir -p "$APP_DIR/backups"
-( crontab -l 2>/dev/null | rg -v "backup.sh $APP_DIR" ; echo "$CRON_LINE" ) | crontab -
+( crontab -l 2>/dev/null | grep -v "backup.sh $APP_DIR" ; echo "$CRON_LINE" ) | crontab -
 # فایل cron سیستمی هم برای اطمینان (root)
 echo "$CRON_LINE" > /etc/cron.d/mahi-tanur-backup
 chmod 644 /etc/cron.d/mahi-tanur-backup
@@ -171,7 +175,7 @@ chmod 644 /etc/cron.d/mahi-tanur-backup
 "$APP_DIR/scripts/backup.sh" "$APP_DIR" || true
 
 # ─────────────────────────── ۹) فایروال ───────────────────────────
-if command -v ufw >/dev/null 2>&1 && ufw status | rg -q "active"; then
+if command -v ufw >/dev/null 2>&1 && ufw status | grep -q "active"; then
   ufw allow 80/tcp  >/dev/null 2>&1 || true
   ufw allow 443/tcp >/dev/null 2>&1 || true
 fi
