@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -52,10 +53,9 @@ prompt
 server.log
 # Skills directory
 /skills/
-# env & database
-.env
-.env.*
-/db/
+# env & database (فایل .env از قبل track شده و .env.example باید در ریپو باشد)
+/db/*
+!/db/.gitkeep
 /upload/
 /public/uploads/
 .zscripts/

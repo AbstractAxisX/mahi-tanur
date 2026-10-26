@@ -4,11 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
+    "dev:local": "next dev",
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
     "lint": "eslint .",
     "db:push": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
+    "db:seed": "bun prisma/seed.ts",
+    "db:seed:node": "npx --yes tsx prisma/seed.ts",
+    "setup": "prisma generate && prisma db push && bun prisma/seed.ts",
+    "setup:node": "prisma generate && prisma db push && npx --yes tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset"
   },

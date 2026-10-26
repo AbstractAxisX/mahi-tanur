@@ -1,27 +1,23 @@
-// Seed: ماهی‌یار — dynamic data (admin-editable later via admin panel)
+// Seed: ماهی تنور — دیتای تستی (بعداً از پنل ادمین هم قابل ویرایش است)
 import { PrismaClient } from "@prisma/client";
 
 const db = new PrismaClient();
 
+// عکس‌ها لوکال هستند (public/assets/seed) تا پروژه بدون اینترنت و CDN خارجی هم کامل کار کند
 const IMG = {
-  hero: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/59030ca6228c.jpg",
-  heroAlt: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/59030ca6228c.jpg",
-  trout: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/0ba7871c79fe.jpg",
-  trout2: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b85ac5aaac21.jpg",
-  carp: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c7e22b7e6bb6.jpg",
-  carp2: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d7db21082b25.jpg",
-  salmon: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/aad9d3a52085.jpg",
-  salmon2: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/eb60638060d4.jpg",
-  sole: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/467b6edc2934.jpg",
-  seabass: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/41b65773d9ac.jpg",
-  shir: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d01989f40e22.jpg",
-  shir2: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e339a9eeca04.jpg",
-  fish2: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/42cb1ce0c3a0.jpg",
-  veg: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/3290854866de.jpg",
-  lemon: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/65712c768c51.jpeg",
-  tomato: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d69075b1000a.jpg",
-  onion: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/fce72d2ef398.jpg",
-  garlic: "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/a650ffb25dae.jpg",
+  trout: "/assets/seed/trout.jpg",
+  trout2: "/assets/seed/trout2.jpg",
+  carp: "/assets/seed/carp.jpg",
+  carp2: "/assets/seed/carp2.png",
+  salmon: "/assets/seed/salmon.jpg",
+  sole: "/assets/seed/sole.jpg",
+  seabass: "/assets/seed/seabass.jpg",
+  shir: "/assets/seed/shir.jpg",
+  veg: "/assets/seed/veg.png",
+  lemon: "/assets/seed/lemon.jpg",
+  tomato: "/assets/seed/tomato.png",
+  onion: "/assets/seed/onion.jpg",
+  garlic: "/assets/seed/garlic.png",
 };
 
 async function main() {
