@@ -89,6 +89,8 @@ export default function FishDetailView() {
       deliveryMethod: chosenMethod ? { id: chosenMethod.id, code: chosenMethod.code, title: chosenMethod.title, price: chosenMethod.price } : null,
       addressId: chosenAddress.id,
       addressFull: chosenAddress.full,
+      addressLat: chosenAddress.lat ?? null,
+      addressLng: chosenAddress.lng ?? null,
       receiver: receiver.trim(),
       receiverPhone: phone,
       note: note.trim(),
@@ -105,30 +107,14 @@ export default function FishDetailView() {
       <ScreenHeader title={fish.name} action={<span className="h-11 w-11 grid place-items-center rounded-full bg-white/60"><FishIcon className="h-6 w-6 text-brand" aria-hidden /></span>} />
 
       <div className="space-y-3.5">
-        {/* ───── کارت محصول ───── */}
-        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="my-card p-3.5 flex gap-3.5">
-          <div className="flex-1 min-w-0 order-1">
-            <div className="flex items-center gap-2">
-              <span className="h-7 w-7 rounded-full bg-brand-mist grid place-items-center">
-                <FishIcon className="h-4 w-4 text-brand" aria-hidden />
-              </span>
-              <h2 className="text-[19px] font-black text-brand leading-7">{fish.name}</h2>
-            </div>
-            <p className="text-[12.5px] text-body leading-[19px] mt-2">{fish.description}</p>
-            <div className="mt-3 flex items-center gap-2">
-              <span className="rounded-full bg-brand-mist px-3 py-1 text-[12px] font-extrabold text-brand-deep tabular-nums">
-                {faPrice(fish.price)} / هر عدد
-              </span>
-              <span className="text-[11px] text-grey">قیمت پایه</span>
-            </div>
-          </div>
-          <div className="relative w-[38%] shrink-0 order-2 self-stretch">
-            <span className="block h-full w-full rounded-[18px] overflow-hidden shadow-[0_6px_18px_rgba(88,24,69,.22)]">
-              <Image src={fish.image} alt={fish.name} fill unoptimized className="object-cover" sizes="180px" />
-            </span>
+        {/* ───── کارت محصول (عکس ۱۶:۹ + نام + توضیحات — عمودی و خوانا) ───── */}
+        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="my-card p-3.5">
+          {/* عکس تمام‌عرض ۱۶:۹ با گوشه گرد */}
+          <div className="relative w-full aspect-video rounded-[16px] overflow-hidden shadow-[0_6px_18px_rgba(88,24,69,.22)] bg-brand-faint">
+            <Image src={fish.image} alt={fish.name} fill unoptimized className="object-cover" sizes="448px" />
             <FavHeart
               filled={!!isFav}
-              className="absolute -top-2 -left-2"
+              className="absolute top-2 left-2"
               onClick={async () => {
                 await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fishId: fish.id }) });
                 window.dispatchEvent(new CustomEvent("mahi:refresh"));
@@ -136,6 +122,20 @@ export default function FishDetailView() {
               }}
             />
           </div>
+          {/* نام + قیمت در یک ردیف */}
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="h-8 w-8 shrink-0 rounded-full bg-brand-mist grid place-items-center">
+                <FishIcon className="h-[18px] w-[18px] text-brand" aria-hidden />
+              </span>
+              <h2 className="text-[19px] font-black text-brand leading-7 truncate">{fish.name}</h2>
+            </div>
+            <span className="shrink-0 rounded-full bg-brand-mist px-3 py-1 text-[12px] font-extrabold text-brand-deep tabular-nums">
+              {faPrice(fish.price)} <span className="font-bold">/ هر عدد</span>
+            </span>
+          </div>
+          {/* توضیحات */}
+          <p className="text-[12.5px] text-body leading-[20px] mt-2.5">{fish.description}</p>
         </motion.section>
 
         {/* ───── تعداد ماهی ───── */}
@@ -272,6 +272,12 @@ export default function FishDetailView() {
                 {chosenAddress ? chosenAddress.full : "برای انتخاب آدرس ضربه بزنید"}
               </span>
             </span>
+            {chosenAddress?.lat != null && chosenAddress?.lng != null && (
+              <span className="shrink-0 inline-flex items-center gap-1 h-9 px-3 rounded-full bg-teal-mist text-teal-deep text-[11px] font-black" title="این آدرس لوکیشن نقشه دارد">
+                <MapPin className="h-4 w-4" fill="currentColor" aria-hidden />
+                نقشه
+              </span>
+            )}
             <span className="shrink-0 inline-flex items-center gap-1 h-9 px-4 rounded-full bg-brand text-white text-[12px] font-bold">
               <MapIcon className="h-4 w-4" aria-hidden />
               تغییر
@@ -412,6 +418,11 @@ export default function FishDetailView() {
                     <span className="flex items-center gap-2">
                       <span className="text-[14px] font-extrabold text-ink">{a.title}</span>
                       {a.isDefault && <span className="text-[9px] rounded-full bg-teal-brand text-white px-2 py-0.5 font-bold">پیش‌فرض</span>}
+                      {a.lat != null && a.lng != null && (
+                        <span className="inline-flex items-center gap-0.5 text-[9px] rounded-full bg-teal-mist text-teal-deep px-2 py-0.5 font-bold">
+                          <MapPin className="h-2.5 w-2.5" fill="currentColor" aria-hidden /> لوکیشن
+                        </span>
+                      )}
                     </span>
                     <span className="block text-[11.5px] text-grey leading-[16px] mt-0.5 line-clamp-2">{a.full}</span>
                     {a.receiver && <span className="block text-[10px] text-teal-deep mt-0.5">{a.receiver} · {toFaDigits(a.phone || "")}</span>}
@@ -422,7 +433,7 @@ export default function FishDetailView() {
             })}
             <button
               type="button"
-              onClick={() => { setAddrSheet(false); go("address-form", { backTo: "fish" }); }}
+              onClick={() => { setAddrSheet(false); go("address-form", { backTo: "fish", fishId: fish.id }); }}
               className="w-full flex items-center justify-center gap-2 rounded-[18px] border-2 border-dashed border-brand-mid p-3.5 text-brand font-extrabold text-[13px] active:scale-[.99] transition-transform"
             >
               <Pencil className="h-4 w-4" aria-hidden />

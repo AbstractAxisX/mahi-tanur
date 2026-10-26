@@ -58,11 +58,11 @@ export default function HomeView() {
           <div className="flex-1 flex justify-center px-2">
             {avatar ? (
               <span className="relative block h-14 w-28">
-                <Image src={avatar} alt={settings?.appName || "ماهی تنو"} fill unoptimized className="object-contain" sizes="112px" />
+                <Image src={avatar} alt={settings?.appName || "ماهی تنور"} fill unoptimized className="object-contain" sizes="112px" />
               </span>
             ) : (
               <span className="text-center leading-6 drop-shadow-[0_2px_6px_rgba(88,24,69,.55)]">
-                <span className="block text-white text-[24px] font-black">{settings?.appName || "ماهی تنو"}</span>
+                <span className="block text-white text-[24px] font-black">{settings?.appName || "ماهی تنور"}</span>
                 <span className="block text-white/90 text-[10.5px] font-bold">{settings?.appSlogan}</span>
               </span>
             )}
@@ -253,7 +253,7 @@ export default function HomeView() {
           {settings?.footerNote || "عشق ماهی، عشق تازگی"} <span aria-hidden>❤️</span>
         </p>
         <p className="text-[10px] text-grey mt-1">
-          {settings?.appName || "ماهی تنو"} · {toFaDigits(1404)}
+          {settings?.appName || "ماهی تنور"} · {toFaDigits(1404)}
         </p>
       </footer>
     </div>

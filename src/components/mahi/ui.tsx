@@ -8,7 +8,7 @@ import { PiFish } from "react-icons/pi";
 import { useApp } from "./AppContext";
 import { useMahiStore } from "./store";
 
-/* ───────── لوگو (داینامیک: لوگوی PNG ادمین یا نام متنی ماهی تنو) ───────── */
+/* ───────── لوگو (داینامیک: لوگوی PNG ادمین یا نام متنی ماهی تنور) ───────── */
 export function MahiLogo({ size = "md", light = false }: { size?: "sm" | "md" | "lg"; light?: boolean }) {
   const s = size === "lg" ? "text-2xl" : size === "md" ? "text-xl" : "text-lg";
   const { data } = useApp();
@@ -16,7 +16,7 @@ export function MahiLogo({ size = "md", light = false }: { size?: "sm" | "md" | 
   if (settings?.logoImage) {
     return (
       <span className="relative inline-block h-11 w-24 select-none">
-        <Image src={settings.logoImage} alt={settings.appName || "ماهی تنو"} fill unoptimized className="object-contain" sizes="96px" />
+        <Image src={settings.logoImage} alt={settings.appName || "ماهی تنور"} fill unoptimized className="object-contain" sizes="96px" />
       </span>
     );
   }
@@ -24,7 +24,7 @@ export function MahiLogo({ size = "md", light = false }: { size?: "sm" | "md" | 
     <span className="inline-flex items-center gap-1.5 select-none">
       <PiFish className={cn("h-6 w-6 text-brand", light && "text-white", size === "lg" && "h-7 w-7")} aria-hidden />
       <span className={cn("font-black tracking-tight text-brand", light && "text-white drop-shadow-[0_2px_0_rgba(168,20,87,.55)]", s)}>
-        {settings?.appName || "ماهی تنو"}
+        {settings?.appName || "ماهی تنور"}
       </span>
       <Waves className="h-3 w-8 text-teal-brand shrink-0" strokeWidth={2.4} aria-hidden />
     </span>

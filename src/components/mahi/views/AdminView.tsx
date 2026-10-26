@@ -8,11 +8,13 @@ import {
   Settings as SettingsIcon, LayoutGrid, Fish as FishIcon, Salad, Clock, Truck, ClipboardList,
   Plus, Pencil, Trash2, Upload, Loader2, Image as ImageIcon, Sun, Moon, Home as HomeIcon,
   Navigation, ShieldCheck, Store, Tag, Phone as PhoneIcon, Info as InfoIcon, Check,
+  MapPin, Copy, ChevronDown, ExternalLink,
 } from "lucide-react";
 
 import { ScreenHeader, PillBtn, CardTitle, StatusBadge } from "../ui";
 import { cn } from "@/lib/utils";
 import { faPrice, toFaDigits, faDateTime } from "@/lib/format";
+import { osmEmbedUrl } from "@/lib/geo";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -72,6 +74,7 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
 const rv = {
   str: (r: AdminRecord | null, k: string): string => (r && typeof r[k] === "string" ? (r[k] as string) : ""),
   num: (r: AdminRecord | null, k: string): number => (r && typeof r[k] === "number" ? (r[k] as number) : 0),
+  optNum: (r: AdminRecord | null, k: string): number | null => (r && typeof r[k] === "number" ? (r[k] as number) : null),
 };
 
 function parseExtras(json: string): { name: string }[] {
@@ -587,6 +590,8 @@ function OrderCard({
   onStatus: (status: string) => void;
   onDelete: () => void;
 }) {
+  const { toast } = useToast();
+  const [mapOpen, setMapOpen] = useState(false);
   const fishName = rv.str(rec, "fishName");
   const fishImage = rv.str(rec, "fishImage");
   const quantity = rv.num(rec, "quantity");
@@ -600,6 +605,19 @@ function OrderCard({
   const note = rv.str(rec, "note");
   const createdAt = rv.str(rec, "createdAt");
   const extras = parseExtras(rv.str(rec, "extrasJson"));
+  const lat = rv.optNum(rec, "addressLat");
+  const lng = rv.optNum(rec, "addressLng");
+  const hasLoc = lat != null && lng != null;
+
+  const copyCoords = async () => {
+    if (lat == null || lng == null) return;
+    try {
+      await navigator.clipboard.writeText(`${lat},${lng}`);
+      toast({ title: "مختصات کپی شد", description: `${lat}, ${lng}` });
+    } catch {
+      toast({ title: "کپی ناموفق بود" });
+    }
+  };
 
   return (
     <motion.article
@@ -609,8 +627,8 @@ function OrderCard({
       role="listitem"
     >
       <div className="flex items-start gap-3">
-        <span className="relative h-16 w-16 shrink-0 rounded-2xl overflow-hidden border-2 border-brand-soft bg-brand-faint">
-          {fishImage ? <Image src={fishImage} alt={fishName} fill unoptimized sizes="64px" className="object-cover" /> : null}
+        <span className="relative w-20 aspect-video shrink-0 rounded-xl overflow-hidden border-2 border-brand-soft bg-brand-faint">
+          {fishImage ? <Image src={fishImage} alt={fishName} fill unoptimized sizes="80px" className="object-cover" /> : null}
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
@@ -635,6 +653,79 @@ function OrderCard({
           {note ? <p className="mt-0.5 text-[10.5px] font-bold text-brand-deep">یادداشت: {note}</p> : null}
         </div>
       </div>
+
+      {/* ── لوکیشن تحویل روی نقشه + باز کردن در برنامه‌های مسیریابی ── */}
+      {hasLoc && lat != null && lng != null ? (
+        <div className="rounded-[16px] border-2 border-teal-mist bg-teal-mist/25 p-2.5 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-black text-teal-deep flex items-center gap-1.5">
+              <MapPin className="h-4 w-4" fill="currentColor" aria-hidden />
+              موقعیت تحویل روی نقشه
+            </span>
+            <button
+              type="button"
+              onClick={() => setMapOpen((v) => !v)}
+              aria-expanded={mapOpen}
+              className="inline-flex items-center gap-1 h-7 px-2.5 rounded-full bg-white text-teal-deep text-[10.5px] font-black active:scale-95 transition-transform"
+            >
+              {mapOpen ? "بستن نقشه" : "نمایش نقشه"}
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", mapOpen && "rotate-180")} aria-hidden />
+            </button>
+          </div>
+          {mapOpen && (
+            <iframe
+              src={osmEmbedUrl(lat, lng)}
+              title={`نقشهٔ موقعیت تحویل — ${fishName}`}
+              loading="lazy"
+              className="h-44 w-full rounded-[12px] border-0 bg-white"
+            />
+          )}
+          <p dir="ltr" className="text-right text-[10px] font-bold text-grey tabular-nums">
+            {lat.toFixed(5)}, {lng.toFixed(5)}
+          </p>
+          <div className="grid grid-cols-4 gap-1.5">
+            <a
+              href={`geo:${lat},${lng}`}
+              className="inline-flex items-center justify-center gap-1 h-9 rounded-full bg-teal-brand text-white text-[10.5px] font-black active:scale-95 transition-transform"
+              aria-label="باز کردن در برنامه نقشهٔ گوشی"
+            >
+              <Navigation className="h-3.5 w-3.5" aria-hidden />
+              نقشه گوشی
+            </a>
+            <a
+              href={`https://maps.google.com/?q=${lat},${lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1 h-9 rounded-full bg-brand-mist text-brand-deep text-[10.5px] font-black active:scale-95 transition-transform"
+              aria-label="باز کردن در گوگل مپ"
+            >
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+              گوگل‌مپ
+            </a>
+            <a
+              href={`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1 h-9 rounded-full bg-brand-mist text-brand-deep text-[10.5px] font-black active:scale-95 transition-transform"
+              aria-label="باز کردن در ویز"
+            >
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+              ویز
+            </a>
+            <button
+              type="button"
+              onClick={() => void copyCoords()}
+              className="inline-flex items-center justify-center gap-1 h-9 rounded-full bg-brand-mist text-brand-deep text-[10.5px] font-black active:scale-95 transition-transform"
+              aria-label="کپی مختصات"
+            >
+              <Copy className="h-3.5 w-3.5" aria-hidden />
+              کپی
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-[10.5px] text-grey font-bold">📍 این سفارش لوکیشن نقشه ندارد</p>
+      )}
 
       <div className="flex items-center justify-between pt-2 border-t border-dashed border-brand-soft">
         <span className="text-[15px] font-black text-brand-deep">{faPrice(total)}</span>

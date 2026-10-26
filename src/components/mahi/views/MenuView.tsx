@@ -73,41 +73,38 @@ export default function MenuView() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(i * 0.06, 0.3) }}
-              className="my-card p-3 flex gap-3 active:scale-[.99] transition-transform cursor-pointer"
+              className="my-card p-3 active:scale-[.99] transition-transform cursor-pointer"
               onClick={() => go("fish", { fishId: f.id })}
             >
-              <div className="relative w-28 h-28 shrink-0">
-                <span className="relative block w-full h-full rounded-[18px] overflow-hidden shadow-[0_4px_12px_rgba(88,24,69,.18)]">
-                  <Image src={f.image} alt={f.name} fill unoptimized className="object-cover" sizes="112px" />
-                </span>
+              {/* عکس ۱۶:۹ با گوشه گرد */}
+              <div className="relative w-full aspect-video rounded-[16px] overflow-hidden shadow-[0_4px_14px_rgba(88,24,69,.18)] bg-brand-faint">
+                <Image src={f.image} alt={f.name} fill unoptimized className="object-cover" sizes="448px" />
                 <FavHeart
                   filled={!!isFav}
-                  className="absolute -top-1.5 -left-1.5"
+                  className="absolute top-2 left-2"
                   onClick={async () => {
                     await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fishId: f.id }) });
                     window.dispatchEvent(new CustomEvent("mahi:refresh"));
                   }}
                 />
               </div>
-              <div className="flex-1 min-w-0 flex flex-col">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-[15px] font-extrabold text-ink leading-6">{f.name}</h2>
-                  {f.badgeText ? (
-                    <Badge className="bg-teal-brand hover:bg-teal-brand text-[10px] h-5 px-2 border-none">
-                      <Sparkles className="h-3 w-3" aria-hidden /> {f.badgeText}
-                    </Badge>
-                  ) : null}
+              <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                <h2 className="text-[15px] font-extrabold text-ink leading-6">{f.name}</h2>
+                {f.badgeText ? (
+                  <Badge className="bg-teal-brand hover:bg-teal-brand text-[10px] h-5 px-2 border-none">
+                    <Sparkles className="h-3 w-3" aria-hidden /> {f.badgeText}
+                  </Badge>
+                ) : null}
+              </div>
+              <p className="text-[11px] text-grey leading-[16px] mt-1 line-clamp-2">{f.description}</p>
+              <div className="mt-2 flex items-end justify-between">
+                <div>
+                  <p className="text-[10px] text-grey">{catName}</p>
+                  <p className="text-[15px] font-black text-brand tabular-nums">{faPrice(f.price)}</p>
                 </div>
-                <p className="text-[11px] text-grey leading-[16px] mt-1 line-clamp-2">{f.description}</p>
-                <div className="mt-auto flex items-end justify-between pt-2">
-                  <div>
-                    <p className="text-[10px] text-grey">{catName}</p>
-                    <p className="text-[15px] font-black text-brand tabular-nums">{faPrice(f.price)}</p>
-                  </div>
-                  <span className="h-10 w-10 rounded-full bg-brand grid place-items-center text-white shadow-[0_6px_16px_rgba(236,64,122,.4)] active:scale-90 transition-transform" aria-hidden>
-                    <ChevronLeft className="h-5 w-5" strokeWidth={3} />
-                  </span>
-                </div>
+                <span className="h-10 w-10 rounded-full bg-brand grid place-items-center text-white shadow-[0_6px_16px_rgba(236,64,122,.4)] active:scale-90 transition-transform" aria-hidden>
+                  <ChevronLeft className="h-5 w-5" strokeWidth={3} />
+                </span>
               </div>
             </motion.article>
           );

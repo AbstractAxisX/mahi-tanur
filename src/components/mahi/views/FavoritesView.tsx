@@ -36,9 +36,9 @@ export default function FavoritesView() {
             className="my-card p-3 w-full flex items-center gap-3 text-right active:scale-[.99] transition-transform cursor-pointer"
             aria-label={f.name}
           >
-            <span className="relative w-24 h-24 shrink-0">
-              <span className="block w-full h-full rounded-[18px] overflow-hidden shadow-[0_4px_12px_rgba(88,24,69,.18)]">
-                <Image src={f.image} alt={f.name} fill unoptimized className="object-cover" sizes="96px" />
+            <span className="relative w-28 aspect-video shrink-0">
+              <span className="block w-full h-full rounded-[16px] overflow-hidden shadow-[0_4px_12px_rgba(88,24,69,.18)]">
+                <Image src={f.image} alt={f.name} fill unoptimized className="object-cover" sizes="112px" />
               </span>
               <FavHeart
                 filled

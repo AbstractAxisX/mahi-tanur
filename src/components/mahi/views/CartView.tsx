@@ -58,6 +58,8 @@ export default function CartView() {
         timeSlotLabel: c.timeSlot?.label ?? "",
         timeSlotShift: c.timeSlot?.shift ?? "",
         addressFull: c.addressFull,
+        addressLat: c.addressLat ?? null,
+        addressLng: c.addressLng ?? null,
         receiver: c.receiver,
         receiverPhone: c.receiverPhone,
         note: c.note || null,
@@ -94,8 +96,8 @@ export default function CartView() {
             aria-label={`آیتم ${c.fishName}`}
           >
             <div className="flex gap-3">
-              <span className="relative w-24 h-24 shrink-0 rounded-[18px] overflow-hidden shadow-[0_4px_14px_rgba(88,24,69,.2)]">
-                <Image src={c.fishImage} alt={c.fishName} fill unoptimized className="object-cover" sizes="96px" />
+              <span className="relative w-28 aspect-video shrink-0 rounded-[16px] overflow-hidden shadow-[0_4px_14px_rgba(88,24,69,.2)]">
+                <Image src={c.fishImage} alt={c.fishName} fill unoptimized className="object-cover" sizes="112px" />
                 <span className="absolute bottom-1 left-1 rounded-full bg-brand text-white text-[10px] font-black px-2 py-0.5 tabular-nums">
                   ×{toFaDigits(c.quantity)}
                 </span>

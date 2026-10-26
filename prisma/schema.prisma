@@ -10,7 +10,7 @@ datasource db {
 // ─── پیکربندی سایت (داینامیک - قابل ویرایش توسط ادمین) ───
 model SiteSettings {
   id            Int     @id @default(1)
-  appName       String  @default("ماهی تنو")
+  appName       String  @default("ماهی تنور")
   appSlogan     String  @default("سفارش آنلاین ماهی تازه")
   logoImage     String? // لوگوی PNG که ادمین آپلود می‌کند
   heroImage     String? // عکس کاور تمام‌صفحه بالای صفحه اصلی
@@ -101,6 +101,8 @@ model Address {
   full      String
   receiver  String?
   phone     String?
+  lat       Float? // عرض جغرافیایی — موقعیت روی نقشه
+  lng       Float? // طول جغرافیایی — موقعیت روی نقشه
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
 }
@@ -130,6 +132,8 @@ model Order {
   timeSlotLabel      String
   timeSlotShift      String   @default("")
   addressFull        String
+  addressLat         Float?  // موقعیت تحویل روی نقشه (GPS کاربر)
+  addressLng         Float?
   receiver           String
   receiverPhone      String
   note               String?

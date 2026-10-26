@@ -41,7 +41,7 @@
   --radius-lg: var(--radius);
   --radius-xl: var(--radius) + 4px;
 
-  /* ─── پالت ماهی تنو (مطابق موکاپ) ─── */
+  /* ─── پالت ماهی تنور (مطابق موکاپ) ─── */
   --color-brand: #ec407a;
   --color-brand-deep: #d81b60;
   --color-brand-dark: #ad1457;
@@ -157,7 +157,7 @@ input[type="number"] {
   scrollbar-width: none;
 }
 
-/* کارت استاندارد ماهی تنو */
+/* کارت استاندارد ماهی تنور */
 .my-card {
   background: #ffffff;
   border-radius: 24px;

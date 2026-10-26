@@ -31,7 +31,7 @@ async function main() {
     update: {},
     create: {
       id: 1,
-      appName: "ماهی تنو",
+      appName: "ماهی تنور",
       appSlogan: "سفارش آنلاین ماهی تازه",
       logoImage: null,
       heroImage: "/assets/hero-bg.png",
@@ -193,9 +193,9 @@ async function main() {
 
   // ── آدرس‌های ذخیره‌شده ──
   const addrDefs = [
-    { title: "خانه", full: "اصفهان، خیابان سعیدی، نبش کوچه توفیق، زنگ ۴", receiver: "احسان", phone: "۰۹۱۲۱۴۴۹۰۵۴", isDefault: true },
-    { title: "محل کار", full: "اصفهان، خیابان نصر، پلاک ۱۲، طبقه دوم", receiver: "احسان", phone: "۰۹۱۲۱۴۴۹۰۵۴", isDefault: false },
-    { title: "خانه مادر", full: "اصفهان، جنوب بلوار شهید فهمیده، کوچه ۱۲، پلاک ۸", receiver: "مادر", phone: "۰۹۱۹۱۴۹۴۵۵۷", isDefault: false },
+    { title: "خانه", full: "اصفهان، خیابان سعیدی، نبش کوچه توفیق، زنگ ۴", receiver: "احسان", phone: "۰۹۱۲۱۴۴۹۰۵۴", isDefault: true, lat: 32.64237, lng: 51.66742 },
+    { title: "محل کار", full: "اصفهان، خیابان نصر، پلاک ۱۲، طبقه دوم", receiver: "احسان", phone: "۰۹۱۲۱۴۴۹۰۵۴", isDefault: false, lat: 32.6539, lng: 51.66602 },
+    { title: "خانه مادر", full: "اصفهان، جنوب بلوار شهید فهمیده، کوچه ۱۲، پلاک ۸", receiver: "مادر", phone: "۰۹۱۹۱۴۹۴۵۵۷", isDefault: false, lat: 32.62981, lng: 51.66072 },
   ];
   if ((await db.address.count()) === 0) {
     for (const a of addrDefs) await db.address.create({ data: a });
@@ -229,6 +229,8 @@ async function main() {
         timeSlotLabel: "۱۱:۰۰ تا ۱۳:۰۰",
         timeSlotShift: "ظهر",
         addressFull: "اصفهان، خیابان سعیدی، نبش کوچه توفیق، زنگ ۴",
+        addressLat: 32.64237,
+        addressLng: 51.66742,
         receiver: "احسان",
         receiverPhone: "۰۹۱۲۱۴۴۹۰۵۴",
         note: "زنگ تفریح",
@@ -248,6 +250,8 @@ async function main() {
         timeSlotLabel: "۱۸:۰۰ تا ۲۰:۰۰",
         timeSlotShift: "عصر",
         addressFull: "اصفهان، خیابان نصر، پلاک ۱۲، طبقه دوم",
+        addressLat: 32.6539,
+        addressLng: 51.66602,
         receiver: "احسان",
         receiverPhone: "۰۹۱۲۱۴۴۹۰۵۴",
         note: null,

@@ -13,6 +13,8 @@ interface IncomingOrder {
   timeSlotLabel: string;
   timeSlotShift?: string;
   addressFull: string;
+  addressLat?: number | null; // موقعیت تحویل روی نقشه
+  addressLng?: number | null;
   receiver: string;
   receiverPhone: string;
   note?: string | null;
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
       const extras = it.extras ?? [];
       const extrasTotal = extras.reduce((s, e) => s + (e.price || 0), 0);
       const total = (it.fishPrice || 0) * (it.quantity || 1) + extrasTotal + (it.deliveryPrice || 0);
+      const lat = typeof it.addressLat === "number" && it.addressLat >= -90 && it.addressLat <= 90 ? it.addressLat : null;
+      const lng = typeof it.addressLng === "number" && it.addressLng >= -180 && it.addressLng <= 180 ? it.addressLng : null;
       const order = await db.order.create({
         data: {
           fishId: it.fishId ?? null,
@@ -49,6 +53,8 @@ export async function POST(req: NextRequest) {
           timeSlotLabel: it.timeSlotLabel,
           timeSlotShift: it.timeSlotShift ?? "",
           addressFull: it.addressFull,
+          addressLat: lat != null && lng != null ? lat : null,
+          addressLng: lng != null && lat != null ? lng : null,
           receiver: it.receiver,
           receiverPhone: it.receiverPhone,
           note: it.note ?? null,

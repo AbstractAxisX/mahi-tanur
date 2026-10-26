@@ -8,7 +8,7 @@ import { ScreenHeader, StatusBadge } from "../ui";
 import { faPrice, toFaDigits, faDateTime } from "@/lib/format";
 import type { TOrder } from "@/lib/types";
 import { motion } from "framer-motion";
-import { Sun, Moon, Truck, MapPin, User, Phone, NotebookPen, ReceiptText, Clock } from "lucide-react";
+import { Sun, Moon, Truck, MapPin, User, Phone, NotebookPen, ReceiptText, Clock, Navigation } from "lucide-react";
 
 export default function OrderDetailView() {
   const { data } = useApp();
@@ -37,8 +37,8 @@ export default function OrderDetailView() {
 
       <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="my-card p-4" aria-label="خلاصه سفارش">
         <div className="flex items-center gap-3.5">
-          <span className="w-24 h-24 rounded-[18px] overflow-hidden shrink-0 shadow-[0_6px_16px_rgba(88,24,69,.2)] relative">
-            <Image src={order.fishImage} alt={order.fishName} fill unoptimized className="object-cover" sizes="96px" />
+          <span className="w-28 aspect-video rounded-[16px] overflow-hidden shrink-0 shadow-[0_6px_16px_rgba(88,24,69,.2)] relative">
+            <Image src={order.fishImage} alt={order.fishName} fill unoptimized className="object-cover" sizes="112px" />
           </span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -74,7 +74,17 @@ export default function OrderDetailView() {
           <span className="h-9 w-9 rounded-full bg-brand-mist grid place-items-center text-brand shrink-0">
             <MapPin className="h-4 w-4" aria-hidden />
           </span>
-          <span className="min-w-0">{order.addressFull}</span>
+          <span className="min-w-0 flex-1">{order.addressFull}</span>
+          {order.addressLat != null && order.addressLng != null && (
+            <a
+              href={`geo:${order.addressLat},${order.addressLng}`}
+              className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-teal-brand text-white text-[11px] font-bold active:scale-95 transition-transform"
+              aria-label="مشاهدهٔ موقعیت تحویل روی نقشه"
+            >
+              <Navigation className="h-3.5 w-3.5" aria-hidden />
+              نقشه
+            </a>
+          )}
         </p>
         <p className="flex items-center gap-2.5 text-[12.5px] text-body font-bold">
           <span className="h-9 w-9 rounded-full bg-brand-mist grid place-items-center text-brand shrink-0">

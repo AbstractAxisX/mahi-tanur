@@ -6,7 +6,7 @@ import { ScreenHeader, PillBtn } from "../ui";
 import { toFaDigits } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { MapPin, ChevronLeft, Pencil, Trash2, Plus, Home as HomeIcon, Star } from "lucide-react";
+import { MapPin, ChevronLeft, Pencil, Trash2, Plus, Home as HomeIcon, Star, Navigation } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AddressesView() {
@@ -52,6 +52,12 @@ export default function AddressesView() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-[15px] font-black text-ink">{a.title}</h2>
+                  {a.lat != null && a.lng != null && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-mist text-teal-deep text-[10px] font-black px-2.5 py-0.5">
+                      <MapPin className="h-3 w-3" fill="currentColor" aria-hidden />
+                      لوکیشن نقشه
+                    </span>
+                  )}
                   {a.isDefault ? (
                     <span className="rounded-full bg-teal-brand text-white text-[10px] font-black px-2.5 py-0.5">پیش‌فرض</span>
                   ) : (
@@ -77,6 +83,16 @@ export default function AddressesView() {
                 <Pencil className="h-3.5 w-3.5" aria-hidden />
                 ویرایش
               </PillBtn>
+              {a.lat != null && a.lng != null && (
+                <a
+                  href={`geo:${a.lat},${a.lng}`}
+                  aria-label={`باز کردن موقعیت ${a.title} در نقشه`}
+                  className="h-9 px-3 rounded-full bg-teal-mist text-teal-deep text-[12px] font-black inline-flex items-center gap-1.5 active:scale-95 transition-transform"
+                >
+                  <Navigation className="h-3.5 w-3.5" aria-hidden />
+                  نقشه
+                </a>
+              )}
               <button
                 type="button"
                 onClick={() => remove(a.id)}

@@ -43,6 +43,8 @@ export interface CartItem {
   deliveryMethod: { id: string; code: string; title: string; price: number } | null;
   addressId: string | null;
   addressFull: string;
+  addressLat: number | null; // موقعیت روی نقشه
+  addressLng: number | null;
   receiver: string;
   receiverPhone: string;
   note: string;

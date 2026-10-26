@@ -36,7 +36,7 @@ function Loader() {
     <div className="min-h-screen grid place-items-center bg-gradient-to-b from-[#fbdcef] to-[#f9c9dd]">
       <div className="text-center animate-pulse">
         <div className="text-5xl mb-3">🐟</div>
-        <p className="font-extrabold text-2xl text-ink">ماهی تنو</p>
+        <p className="font-extrabold text-2xl text-ink">ماهی تنور</p>
         <p className="text-ink/60 text-sm mt-1">در حال آماده‌سازی منوی تازه‌ها…</p>
         <Waves className="h-4 w-28 mx-auto mt-3 text-teal-brand" aria-hidden />
       </div>
@@ -130,7 +130,7 @@ function DrawerMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[86vw] max-w-[340px] bg-brand-faint border-none p-0 rounded-l-[28px]">
         <SheetHeader className="sr-only">
-          <SheetTitle>منوی اصلی ماهی تنو</SheetTitle>
+          <SheetTitle>منوی اصلی ماهی تنور</SheetTitle>
           <SheetDescription>ناوبری به بخش‌های مختلف برنامه</SheetDescription>
         </SheetHeader>
         <div className="p-5 bg-gradient-to-l from-brand to-brand-mid text-white rounded-l-[28px] relative overflow-hidden">
@@ -226,7 +226,7 @@ function Shell() {
           ) : (
             <div className="text-center leading-6">
               <div className="font-black text-[22px] text-ink drop-shadow-[0_1px_0_rgba(255,255,255,.6)]">
-                {data?.settings?.appName || "ماهی تنو"}
+                {data?.settings?.appName || "ماهی تنور"}
               </div>
               <div className="text-[11px] font-bold text-ink-2/80">{data?.settings?.appSlogan || "سفارش آنلاین ماهی تازه"}</div>
             </div>

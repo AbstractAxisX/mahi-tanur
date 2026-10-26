@@ -223,7 +223,7 @@ export default function SettingsView() {
 
       {/* ═══ شیت کیف پول ═══ */}
       {sheet === "wallet" && (
-        <SheetOverlay onClose={() => setSheet(null)} title="کیف پول ماهی تنو" icon={<PiWallet className="h-8 w-8 text-brand" aria-hidden />}>
+        <SheetOverlay onClose={() => setSheet(null)} title="کیف پول ماهی تنور" icon={<PiWallet className="h-8 w-8 text-brand" aria-hidden />}>
           <p className="mt-2 text-[13px] text-grey font-bold">
             موجودی فعلی: <span className="text-brand font-black">{faPrice(0)}</span>
           </p>
