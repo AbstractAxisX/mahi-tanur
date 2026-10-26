@@ -109,3 +109,33 @@ Stage Summary:
 - Site renamed ماهی تنو; logo + cover + promo all admin-editable (PNG upload working)
 - Home page matches all 13 user feedback items; settings page matches mockup layout (beach header, frosted user card, 5 rows) with pink nav + droplet home
 - Repo live at github.com/AbstractAxisX/mahi-tanou
+
+---
+Task ID: 6
+Agent: Main Coordinator (Z.ai Code)
+Task: ۱۶:۹ کردن همه عکس‌های ماهی + بازطراحی کارت محصول + آدرس مبتنی بر لوکیشن GPS/نقشه + مسیریابی سفارش در ادمین + اصلاح نام «ماهی تنور»
+
+Work Log:
+- نام سایت: «ماهی تنو» → «ماهی تنور» در schema default + seed + layout.tsx (title/keywords) + ui.tsx + HomeView + MahiYarApp + SettingsView + globals.css؛ دیتای موجود با prisma/patch-once.ts (یک‌بارمصرف) مهاجرت شد؛ ریپو گیتهاب از mahi-tanou به mahi-tanur تغییر نام یافت (PATCH API) و remote به‌روز شد
+- Schema: Address + lat/lng (Float?)، Order + addressLat/addressLng؛ db:push (غیرمخرب) + seed آدرس‌ها/سفارش‌ها با مختصات اصفهان + پچ دیتای موجود (۳ آدرس + ۴ سفارش)
+- src/lib/geo.ts (NEW): parseCoordText + osmEmbedUrl (امبد OSM با نشانگر بدون کلید API) + geoLinks
+- ۱۶:۹ همه‌جا: MenuView (کارت عمودی: عکس تمام‌عرض aspect-video + نام/توضیح/قیمت)، FishDetailView (کارت محصول بازطراحی عمودی: عکس ۱۶:۹ rounded-[16px] + ردیف نام/قیمت + توضیحات)، CartView/FavoritesView/OrderDetailView (w-28 aspect-video)، AdminView OrderCard (w-20 aspect-video)؛ HomeView از قبل ۱۶:۹ بود
+- AddressFormView (REWRITE بخش نقشه): دکمه «دریافت موقعیت فعلی (GPS)» با navigator.geolocation.getCurrentPosition (enableHighAccuracy) + پیام‌های خطای فارسی برای رد دسترسی/عدم دسترس بودن/تایم‌اوت + امبد نقشه OSM با نشانگر + نمایش مختصات + دقت متر + «ورود دستی مختصات» (خودکار باز می‌شود اگر GPS خطا دهد) + حذف لوکیشن؛ ذخیره lat/lng همراه آدرس
+- API: addresses POST/PATCH با اعتبارسنجی مختصات (-90..90 / -180..180، هر دو با هم یا هیچ)؛ orders POST با addressLat/addressLng
+- جریان سفارش: CartItem + addressLat/addressLng؛ FishDetailView پاس دادن مختصات آدرس انتخابی؛ CartView payload؛ badge «لوکیشن» در شیت آدرس FishDetailView و صفحه AddressesView + دکمه نقشه (geo:)؛ OrderDetailView دکمه «نقشه»
+- AdminView OrderCard: باکس «موقعیت تحویل روی نقشه» — toggle نمایش نقشه (iframe OSM lazy) + مختصات LTR + ۴ دکمه: نقشه گوشی (geo:)، گوگل‌مپ، ویز، کپی مختصات (clipboard + toast)؛ اگر لوکیشن نباشد پیام جایگزین
+- فیکس باگ قدیمی: بازگشت از فرم آدرس به fish با fishId حفظ می‌شود (go با fishId: fish.id)
+- ریپوی dev server: پراسس قبلی با pkill کشته شد؛ ری‌استارت با الگوی (setsid nohup … &) در ساب‌شل تا بین تماس‌های ابزار زنده بماند
+
+Verification:
+- bun run lint: 0 error
+- API e2e: POST آدرس با lat/lng ✓، PATCH پاک‌سازی ✓، DELETE ✓، POST سفارش با addressLat/Lng ✓ (تست‌ها پاک شدند)
+- agent-browser e2e (430×932 و 1280×800): نام ماهی تنور در title/هدر/پاورقی ✓؛ منو ۱.۷۸ (374×210) ✓؛ جزئیات ۱.۷۸ + rounded ✓؛ GPS در هدلس → پیام «دسترسی رد شد» ✓؛ ورود دستی 32.6539/51.666 → امبد OSM با marker ✓؛ ذخیره آدرس → DB lat/lng ✓؛ سفارش کامل (سوف ×۱ + پیک رفت‌وبرگشت = ۲۹۰٬۰۰۰) → order با lat/lng در DB ✓؛ ادمین: باکس نقشه + toggle + ۴ لینک (geo:32.6539,51.66602 / maps.google / waze / کپی) ✓؛ VLM: کارت محصول «مرتب و خوانا» ✓، نقشه فرم آدرس با نشانگر ✓، ادمین باکس نقشه + دکمه‌ها + نشانگر سبز ✓؛ 0 خطای کنسول/صفحه؛ فوتر چسبان navBottom=winH در موبایل و دسکتاپ ✓
+- دیتای تست پاک شد (4 سفارش، 3 آدرس — حالت اولیه)
+- پوش به github.com/AbstractAxisX/mahi-tanur (کامیت 4a11651) تأیید شد
+
+Stage Summary:
+- نام صحیح «ماهی تنور» همه‌جا (UI + DB + ریپو)
+- همه عکس‌های ماهی ۱۶:۹؛ کارت محصول جزئیات عمودی و خوانا
+- آدرس = لوکیشن نقشه: GPS مرورگر (در کروم واقعی پرامپت اجازه می‌گیرد) + نقشه OSM + ورود دستی
+- ادمین: موقعیت هر سفارش روی نقشه + باز کردن در هر برنامه مسیریابی (geo: عمومی / گوگل‌مپ / ویز) + کپی مختصات
