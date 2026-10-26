@@ -139,3 +139,28 @@ Stage Summary:
 - همه عکس‌های ماهی ۱۶:۹؛ کارت محصول جزئیات عمودی و خوانا
 - آدرس = لوکیشن نقشه: GPS مرورگر (در کروم واقعی پرامپت اجازه می‌گیرد) + نقشه OSM + ورود دستی
 - ادمین: موقعیت هر سفارش روی نقشه + باز کردن در هر برنامه مسیریابی (geo: عمومی / گوگل‌مپ / ویز) + کپی مختصات
+
+---
+Task ID: 7
+Agent: Main Coordinator (Z.ai Code)
+Task: آماده‌سازی پروژه برای اجرای لوکال روی سیستم کاربر (clone از GitHub) با دیتای تستی
+
+Work Log:
+- بررسی وضعیت ریپو: فایل .env با مسیر مطلق سندباکس (file:/home/z/my-project/db/custom.db) کامیت شده بود که روی سیستم کاربر کار نمی‌کرد؛ پوشه db/ و public/uploads/ در گیت نیستند؛ اسکریپت seed در package.json ثبت نشده بود؛ README وجود نداشت
+- کشف مهم: عکس‌های دیتای تستی روی CDN خارجی (z-cdn.chatglm.cn) تاریخ انقضا داشتند (x-oss-expiration: 01 Nov 2026) و ۴ آیتم (کپور کبابی، سبزیجات، گوجه و قارچ، سیر) محتوای یکسان/خراب داشتند (md5 یکسان)
+- دانلود ۱۳ عکس معتبر به public/assets/seed/ (jpg/png) + تولید ۴ عکس جدید با image-generation CLI برای آیتم‌های خراب + حذف ۴ فایل بلااستفاده (hero, salmon2, shir2, fish2)
+- prisma/seed.ts: تمام مسیرهای عکس از URL ریموت به مسیرهای لوکال /assets/seed/* تغییر کرد (پروژه اکنون بدون CDN/اینترنت کامل کار می‌کند) + اصلاح کامنت عنوان به «ماهی تنور»
+- .env به مسیر نسبی file:../db/custom.db تغییر کرد (نسبی به prisma/schema.prisma → <ریشه>/db/custom.db روی هر سیستم) + ساخت .env.example + اصلاح .gitignore (نفی‌شرط !.env.example و !/db/.gitkeep، حذف قوانین تکراری)
+- package.json اسکریپت‌های جدید: dev:local (next dev خالص برای سیستم شخصی)، db:seed (bun)، db:seed:node (npx tsx برای npm)، setup (generate+push+seed با bun)، setup:node (npm)
+- ساخت db/.gitkeep تا پوشه db بعد از clone وجود داشته باشد و prisma db push بتواند فایل بسازد
+- README.md فارسی کامل: پیش‌نیازها، دو روش نصب (bun/npm)، شرح دیتای تستی، ریست، جدول دستورها، راهنمای برنامه (پنل ادمین از منوی ☰)، ساختار پروژه
+- اجرای bun run setup در سندباکس: دیتابیس موجود سالم ماند و همه عکس‌ها به مسیر لوکال آپدیت شدند
+- شبیه‌سازی clone تازه در /tmp/fresh با git archive: bun install → env -u DATABASE_URL bun run setup → next dev -p 3100 → /api/app 200 با داده، عکس seed 200، POST سفارش (نوشتن) موفق، و اثبات با /proc/*/fd که هر پروژه به دیتابیس خودش وصل می‌شود
+- کشف و حل دو مشکل تست: (۱) متغیر محیطی DATABASE_URL سندباکس فایل .env را override می‌کرد (روی سیستم کاربر وجود ندارد)؛ (۲) حذف تصادفی db/custom.db سندباکس که بلافاصله از file handle باز پروسه next-server در /proc/7770/fd بازیابی شد (md5 هر سه fd یکسان = اسنپ‌شات سازگار) و dev server ری‌استارت شد
+- تست مسیر npm: npx --yes tsx prisma/seed.ts در /tmp/fresh موفق
+- پاک‌سازی /tmp/fresh و سرور تست؛ lint پاس (۰ خطا)؛ dev.log بدون خطا؛ GET / و /api/app هر دو 200
+
+Stage Summary:
+- پروژه اکنون روی هر سیستم شخصی با سه دستور اجرا می‌شود: bun install && bun run setup && bun run dev:local (یا معادل npm: npm install && npm run setup:node && npm run dev:local)
+- دیتای تستی کامل + عکس‌ها همه لوکال (مستقل از CDN خارجی منقضی‌شونده)
+- کامیت d6929b2 شامل: .env نسبی، .env.example، README.md، اسکریپت‌های setup/seed، ۱۳ عکس لوکال seed، db/.gitkeep، seed.ts لوکال‌شده
