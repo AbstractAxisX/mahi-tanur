@@ -44,13 +44,13 @@ function Loader() {
   );
 }
 
-/* ───────── نوار پایین: آیکون‌های صورتی، آوت‌لاین/توپر + خانه قطره‌ای ───────── */
+/* ───────── نوار پایین: پس‌زمینه صورتی، آیکون‌های صورتی، آوت‌لاین/توپر + خانه قطره‌ای ───────── */
 function BottomNav() {
   const { view, go } = useMahiStore();
   return (
     <nav
       aria-label="ناوبری اصلی"
-      className="bg-white/95 backdrop-blur rounded-t-[28px] shadow-[0_-6px_24px_rgba(236,64,122,.15)] pb-[max(env(safe-area-inset-bottom),10px)]"
+      className="bg-[#f9c7da] backdrop-blur rounded-t-[28px] shadow-[0_-6px_24px_rgba(216,27,96,.14)] pb-[max(env(safe-area-inset-bottom),10px)]"
     >
       <div className="max-w-md mx-auto grid grid-cols-5 items-end px-2 pt-2">
         {NAV.map((item) => {
@@ -79,7 +79,7 @@ function BottomNav() {
                 >
                   {active ? <Filled className="h-7 w-7" aria-hidden /> : <Outline className="h-7 w-7" aria-hidden />}
                 </span>
-                <span className={`text-[11px] mt-1.5 font-extrabold ${active ? "text-brand" : "text-brand-mid"}`}>
+                <span className={`text-[11px] mt-1.5 font-extrabold ${active ? "text-brand-deep" : "text-brand-mid"}`}>
                   {item.label}
                 </span>
               </button>
@@ -97,11 +97,11 @@ function BottomNav() {
               className="flex flex-col items-center gap-1 pt-2 pb-1 active:scale-95 transition-transform"
             >
               {active ? (
-                <Filled className="h-[26px] w-[26px] text-brand" aria-hidden />
+                <Filled className="h-[26px] w-[26px] text-brand-deep drop-shadow-[0_1px_1px_rgba(255,255,255,.35)]" aria-hidden />
               ) : (
                 <Outline className="h-[26px] w-[26px] text-brand-mid" aria-hidden />
               )}
-              <span className={`text-[11px] font-bold ${active ? "text-brand" : "text-brand-mid"}`}>{item.label}</span>
+              <span className={`text-[11px] font-bold ${active ? "text-brand-deep" : "text-brand-mid"}`}>{item.label}</span>
             </button>
           );
         })}

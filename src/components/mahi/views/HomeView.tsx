@@ -6,7 +6,7 @@ import { useApp } from "../AppContext";
 import { useMahiStore } from "../store";
 import { CircleBtn } from "../ui";
 import { toFaDigits } from "@/lib/format";
-import { PiFish } from "react-icons/pi";
+import { PiFish, PiFishSimple } from "react-icons/pi";
 import { Waves, MapPin, Phone, Clock, Navigation, Menu as MenuIcon, ShoppingBasket } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -92,7 +92,7 @@ export default function HomeView() {
           className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 rounded-full bg-brand px-7 h-[52px] text-white text-[16.5px] font-black border-2 border-white/95 shadow-[0_10px_26px_rgba(168,20,87,.5)] active:scale-95 transition-transform"
         >
           {settings?.heroCtaText || "ثبت سفارش"}
-          <PiFish className="h-[22px] w-[22px] opacity-95" aria-hidden />
+          <PiFishSimple className="h-[21px] w-[21px] opacity-95" aria-hidden />
         </button>
       </section>
 
@@ -153,8 +153,8 @@ export default function HomeView() {
               <span className="relative block w-full aspect-video rounded-[10px] overflow-hidden bg-brand-faint">
                 <Image src={f.image} alt={f.name} fill unoptimized className="object-cover" sizes="96px" />
               </span>
-              {/* نام ماهی */}
-              <span className="block mt-1.5 text-[10.5px] font-extrabold text-ink leading-4 truncate">{f.name}</span>
+              {/* نام ماهی (حداکثر دو خط) */}
+              <span className="block mt-1.5 h-8 overflow-hidden text-[10px] font-extrabold text-ink leading-4">{f.name}</span>
               {/* دکمه تمام عرض */}
               <span className="mt-1 flex h-7 w-full items-center justify-center rounded-[9px] bg-brand text-white text-[10px] font-bold">
                 سفارش

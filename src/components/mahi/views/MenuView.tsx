@@ -77,7 +77,7 @@ export default function MenuView() {
               onClick={() => go("fish", { fishId: f.id })}
             >
               <div className="relative w-28 h-28 shrink-0">
-                <span className="block w-full h-full rounded-[18px] overflow-hidden shadow-[0_4px_12px_rgba(88,24,69,.18)]">
+                <span className="relative block w-full h-full rounded-[18px] overflow-hidden shadow-[0_4px_12px_rgba(88,24,69,.18)]">
                   <Image src={f.image} alt={f.name} fill unoptimized className="object-cover" sizes="112px" />
                 </span>
                 <FavHeart

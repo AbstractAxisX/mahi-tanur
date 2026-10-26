@@ -85,32 +85,48 @@ export default function SettingsView() {
 
   return (
     <div>
-      {/* ═══ سربرگ: دکمه بازگشت صورتی + عنوان + لوگو ═══ */}
-      <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
-        <CircleBtn label="بازگشت" onClick={back}>
-          <ChevronRight className="h-6 w-6" strokeWidth={2.8} />
-        </CircleBtn>
-        <div className="flex-1 text-center">
-          <h1 className="text-[23px] font-black text-ink leading-8 inline-flex items-center gap-1.5">
-            <PiSparkle className="h-4 w-4 text-brand-mid" aria-hidden />
-            تنظیمات
-            <PiSparkle className="h-4 w-4 text-brand-mid" aria-hidden />
-          </h1>
-          <Waves className="h-2.5 w-20 mx-auto text-teal-brand" strokeWidth={2.5} aria-hidden />
+      {/* ═══ سربرگ با پس‌زمینه ساحلی + کارت کاربر (مطابق موکاپ) ═══ */}
+      <div className="relative -mx-4 -mt-1 overflow-hidden pb-6">
+        {/* تصویر ساحلی پشت سربرگ (داینامیک از تنظیمات) */}
+        <div className="absolute inset-0" aria-hidden>
+          <Image
+            src={settings?.heroImage || "/assets/hero-bg.png"}
+            alt=""
+            fill
+            priority
+            unoptimized
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 100vw, 448px"
+          />
         </div>
-        <div className="w-11 shrink-0 flex justify-start">
-          <span className="grid place-items-center">
-            <MahiLogo size="sm" />
-          </span>
-        </div>
-      </div>
 
-      {/* ═══ کارت کاربر: آواتار چپ + نام/شماره/ویرایش راست ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="my-card p-4 relative"
-      >
+        {/* ردیف سربرگ: بازگشت + عنوان + لوگو */}
+        <div className="relative z-10 flex items-center justify-between gap-2 px-4 pt-3 pb-4">
+          <CircleBtn label="بازگشت" onClick={back}>
+            <ChevronRight className="h-6 w-6" strokeWidth={2.8} />
+          </CircleBtn>
+          <div className="flex-1 text-center">
+            <h1 className="text-[23px] font-black text-white leading-8 inline-flex items-center gap-1.5 drop-shadow-[0_2px_6px_rgba(88,24,69,.55)]">
+              <PiSparkle className="h-4 w-4 text-white/90" aria-hidden />
+              تنظیمات
+              <PiSparkle className="h-4 w-4 text-white/90" aria-hidden />
+            </h1>
+            <Waves className="h-2.5 w-20 mx-auto text-white/95 drop-shadow-[0_1px_3px_rgba(88,24,69,.5)]" strokeWidth={2.5} aria-hidden />
+          </div>
+          <div className="w-11 shrink-0 flex justify-start">
+            <span className="grid place-items-center rounded-full bg-white/85 px-2 py-1 shadow-sm">
+              <MahiLogo size="sm" />
+            </span>
+          </div>
+        </div>
+
+        {/* کارت کاربر روی تصویر — آواتار چپ + نام/شماره/ویرایش راست */}
+        <div className="relative z-10 px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-[24px] bg-white/90 backdrop-blur-md p-4 shadow-[0_8px_28px_rgba(168,20,87,.22)] border border-white/60"
+          >
         <div className="flex flex-row-reverse items-center gap-4">
           {/* آواتار با تاج و بج دوربین */}
           <div className="relative shrink-0">
@@ -169,7 +185,9 @@ export default function SettingsView() {
           {profile?.note || "عاشق ماهی، عشق نزدیکه"}
           <Heart className="h-3.5 w-3.5 fill-brand text-brand" aria-hidden />
         </p>
-      </motion.div>
+          </motion.div>
+        </div>
+      </div>
 
       {/* ═══ پنج ردیف تنظیمات (کارت‌های مجزا) ═══ */}
       <div className="mt-4 space-y-3" role="list">
