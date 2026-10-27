@@ -6,7 +6,6 @@ import { useApp } from "../AppContext";
 import { useMahiStore } from "../store";
 import { ScreenHeader, PillBtn } from "../ui";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Home as HomeIcon, Briefcase, Building2, User, Phone, ChevronLeft, Navigation, Crosshair, Trash2, Keyboard, MapPinned } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,6 +13,7 @@ import { toFaDigits } from "@/lib/format";
 import { parseCoordText } from "@/lib/geo";
 import { IRAN_PROVINCES, DEFAULT_PROVINCE, DEFAULT_CITY, provinceByName, cityOf } from "@/lib/iran-geo";
 import type { FlyTarget } from "../MapPicker";
+import SearchableGeoSelect from "../SearchableGeoSelect";
 
 /* نقشه Leaflet فقط سمت کلاینت (دینامیک، بدون SSR) */
 const MapPicker = dynamic(() => import("../MapPicker"), {
@@ -183,47 +183,7 @@ export default function AddressFormView() {
           )}
         </div>
 
-        {/* انتخاب استان و شهر */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <span className="text-[11px] font-bold text-grey flex items-center gap-1">
-              <MapPinned className="h-3.5 w-3.5 text-brand" aria-hidden />
-              استان
-            </span>
-            <Select value={province} onValueChange={onProvinceChange} dir="rtl">
-              <SelectTrigger className="mt-1.5 h-11 w-full rounded-2xl border-2 border-brand-soft bg-white text-[13px] font-bold" aria-label="انتخاب استان">
-                <SelectValue placeholder="انتخاب استان" />
-              </SelectTrigger>
-              <SelectContent className="rounded-2xl max-h-64">
-                {IRAN_PROVINCES.map((p) => (
-                  <SelectItem key={p.name} value={p.name} className="text-[13px]">
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <span className="text-[11px] font-bold text-grey">شهر</span>
-            <Select value={city} onValueChange={onCityChange} dir="rtl">
-              <SelectTrigger className="mt-1.5 h-11 w-full rounded-2xl border-2 border-brand-soft bg-white text-[13px] font-bold" aria-label="انتخاب شهر">
-                <SelectValue placeholder="اول استان را انتخاب کنید" />
-              </SelectTrigger>
-              <SelectContent className="rounded-2xl max-h-64">
-                {(provinceByName(province)?.cities ?? []).map((ct) => (
-                  <SelectItem key={ct.name} value={ct.name} className="text-[13px]">
-                    {ct.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <p className="mb-3 text-[10.5px] text-grey font-bold leading-4">
-          استان و شهرت را انتخاب کن تا نقشه اونجا بره؛ بعد پین دقیق آدرس را با لمس نقشه ثبت کن.
-        </p>
-
-        {/* نقشه تعاملی */}
+        {/* نقشه تعاملی — اول نقشه، بعد انتخاب استان/شهر تا لیستِ بازشو هرگز زیر نقشه نرود */}
         <MapPicker
           lat={lat}
           lng={lng}
@@ -321,6 +281,38 @@ export default function AddressFormView() {
             )}
           </div>
         )}
+
+        {/* ───── انتخاب استان و شهر — زیر نقشه، جستجو‌دار ───── */}
+        <div className="mt-4 pt-4 border-t-2 border-brand-faint">
+          <span className="text-[13px] font-black text-ink flex items-center gap-1.5">
+            <MapPinned className="h-[18px] w-[18px] text-brand" aria-hidden />
+            انتخاب استان و شهر
+          </span>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <SearchableGeoSelect
+              label="استان"
+              icon={<MapPinned className="h-3.5 w-3.5 text-brand" aria-hidden />}
+              value={province}
+              onChange={onProvinceChange}
+              options={IRAN_PROVINCES.map((p) => ({ name: p.name }))}
+              placeholder="انتخاب استان"
+              searchPlaceholder="جستجوی استان…"
+              emptyText="استانی پیدا نشد"
+            />
+            <SearchableGeoSelect
+              label="شهر"
+              value={city}
+              onChange={onCityChange}
+              options={(provinceByName(province)?.cities ?? []).map((ct) => ({ name: ct.name }))}
+              placeholder="انتخاب شهر"
+              searchPlaceholder="جستجوی شهر…"
+              emptyText="شهری پیدا نشد"
+            />
+          </div>
+          <p className="mt-2.5 text-[10.5px] text-grey font-bold leading-4">
+            استان و شهرت را جستجو و انتخاب کن تا نقشه به همان‌جا پرواز کند؛ بعد پین دقیق آدرس را با لمس نقشه ثبت کن.
+          </p>
+        </div>
       </div>
 
       <div className="my-card p-4 mt-3 space-y-4">
