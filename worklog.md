@@ -246,3 +246,26 @@ Stage Summary:
 - بکاپ: هر ۶ ساعت در /var/www/mahi-tanur/backups/ (نگهداری ۱۴ نسخه)
 - یادداشت امنیتی: توکن GitHub و رمز سرور در چت به اشتراک گذاشته شد — کارفرما باید هر دو را عوض کند
 
+
+---
+Task ID: 10
+Agent: Main Agent (Z.ai) — برنامه‌نویس رسمی پروژه از این جلسه
+Task: باز کردن پروژه در محیط کدنویسی + رفع ۳ باگ گزارش‌شده کارفرما + پوش + استقرار مجدد
+
+Work Log:
+- init محیط فول‌استک (zscripts/dev.sh) + انتقال ریپو به ریشه workspace (git init + remote با توکن + checkout main)
+- سیو مشخصات در .credentials.md (gitignore شده: scripts/ssh_exec.py، sftp_upload.py، download/*.png)
+- دیتابیس dev با seed کامل (bun run setup) — پیش‌نمایش کامل با ۸ ماهی تستی
+- باگ ۱ (قیمت ماهی جدید): input عددی → text+inputMode=numeric با پذیرش ارقام فارسی (parseFaNumber + toEnDigits)؛ رشته در فرم؛ پیش‌نمایش زنده faPrice؛ recordToForm/serializeForm بازنویسی؛ API: lib/admin-coerce.ts مشترک برای POST/PATCH (عدد فارسی→Int)؛ روت‌های odel] با پایتون بازنویسی شدند (پوشه کاراکتر خاص دارد)
+- باگ ۲: باکس «نام کاربری: admin — رمز: admin123» از LoginView حذف شد
+- باگ ۳ (نقشه): MapPicker.tsx جدید با react-leaflet@5 + leaflet (OSM tiles) — نقشه همیشه باز، لمس/درگ پین، divIcon تیل؛ src/lib/iran-geo.ts با ۳۱ استان و ۳۰۰+ شهر با مختصات؛ AddressFormView بازنویسی: استان/شهر Select + flyTo (پرواز نرم)، GPS با پیام خطای فارسی + فالبک، ورود دستی حفظ، فیلد بی‌اثر «توضیحات» (در اسکیما نیست) حذف شد
+- رفع کرش Fast Refresh: toEnDigits به ایمپورت AdminView اضافه شد
+- تست مرورگر (agent-browser): ایجاد ماهی با قیمت ۱۹۵۰۰۰ فارسی → price=195000 ✓؛ ویرایش 250000 ✓؛ حذف ✓؛ صفحه ورود حتی با باز بودن بخش مدیر ۰ لیک ✓؛ فرم آدرس: خوزستان→آبادان پرواز دقیق، پین 30.3355,48.3043 ✓، خرمشهر پین 30.4223,48.1769 ✓، ذخیره آدرس با lat/lng ✓، GPS رد شد → پیام دوستانه + نقشه باز ✓؛ VLM تأیید بصری نقشه ✓
+- lint: ۰ خطا؛ کامیت 9edff9a با پیام فارسی کامل → پوش به github.com/AbstractAxisX/mahi-tanur (b3f9654..9edff9a)
+- استقرار پرود: بیلد standalone (۱۷s) + تاربال 58MB + آپلود 34.5s + استخراج با حفظ db/custom.db (md5 قبل/بعد یکسان: 88c230b9…) + pm2 restart
+- تست زنده: GET / 200؛ ۰ لیک مشخصات؛ POST ماهی با قیمت رشته فارسی «۱۹۵۰۰۰» → 195000 ✓ (کانفیگ API)؛ حذف ماهی تستی؛ ورود ادمین ✓
+
+Stage Summary:
+- محیط کدنویسی فعال: dev server پورت 3000 + دیتابیس seed کامل برای پیش‌نمایش
+- هر ۳ باگ فیکس، تست E2E و روی پروداکشن زنده مستقر شد (کامیت 9edff9a)
+- ابزارهای استقرار خصوصی در scripts/ (gitignore)؛ مشخصات در .credentials.md
