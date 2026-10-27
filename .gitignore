@@ -66,3 +66,8 @@ scripts/ssh_exec.py
 scripts/sftp_upload.py
 # اسکرین‌شات‌های توسعه
 download/*.png
+scripts/standalone*.tar.gz
+
+# build artifacts
+.next/
+/tmp/*.tar.gz
