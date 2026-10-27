@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { pickAdminData } from "@/lib/admin-coerce";
 
 const KNOWN = ["categories", "fish", "extras", "timeslots", "delivery-methods", "settings", "orders", "addresses"] as const;
 
@@ -35,20 +36,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ mod
     return NextResponse.json({ error: "unknown model" }, { status: 404 });
   }
   try {
-    const body = await req.json();
+    const body = (await req.json()) as Record<string, unknown>;
+    const data = pickAdminData(body);
     switch (model) {
       case "categories":
-        return NextResponse.json(await db.fishCategory.create({ data: body }), { status: 201 });
+        return NextResponse.json(await db.fishCategory.create({ data }), { status: 201 });
       case "fish":
-        return NextResponse.json(await db.fish.create({ data: body }), { status: 201 });
+        return NextResponse.json(await db.fish.create({ data }), { status: 201 });
       case "extras":
-        return NextResponse.json(await db.extra.create({ data: body }), { status: 201 });
+        return NextResponse.json(await db.extra.create({ data }), { status: 201 });
       case "timeslots":
-        return NextResponse.json(await db.timeSlot.create({ data: body }), { status: 201 });
+        return NextResponse.json(await db.timeSlot.create({ data }), { status: 201 });
       case "delivery-methods":
-        return NextResponse.json(await db.deliveryMethod.create({ data: body }), { status: 201 });
+        return NextResponse.json(await db.deliveryMethod.create({ data }), { status: 201 });
       case "addresses":
-        return NextResponse.json(await db.address.create({ data: body }), { status: 201 });
+        return NextResponse.json(await db.address.create({ data }), { status: 201 });
       default:
         return NextResponse.json({ error: "not allowed" }, { status: 400 });
     }

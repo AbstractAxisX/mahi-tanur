@@ -1,16 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useApp } from "../AppContext";
 import { useMahiStore } from "../store";
 import { ScreenHeader, PillBtn } from "../ui";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Home as HomeIcon, Briefcase, Building2, User, Phone, NotebookPen, ChevronLeft, Navigation, Crosshair, Trash2, Keyboard } from "lucide-react";
+import { MapPin, Home as HomeIcon, Briefcase, Building2, User, Phone, ChevronLeft, Navigation, Crosshair, Trash2, Keyboard, MapPinned } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toFaDigits } from "@/lib/format";
-import { parseCoordText, osmEmbedUrl } from "@/lib/geo";
+import { parseCoordText } from "@/lib/geo";
+import { IRAN_PROVINCES, DEFAULT_PROVINCE, DEFAULT_CITY, provinceByName, cityOf } from "@/lib/iran-geo";
+import type { FlyTarget } from "../MapPicker";
+
+/* نقشه Leaflet فقط سمت کلاینت (دینامیک، بدون SSR) */
+const MapPicker = dynamic(() => import("../MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-60 rounded-[16px] border-2 border-brand-soft bg-brand-faint grid place-items-center">
+      <span className="text-[12px] font-black text-grey">در حال بارگذاری نقشه…</span>
+    </div>
+  ),
+});
 
 const TITLES = [
   { key: "خانه", icon: HomeIcon },
@@ -30,7 +43,6 @@ export default function AddressFormView() {
   const [full, setFull] = useState(editing?.full ?? "");
   const [receiver, setReceiver] = useState(editing?.receiver ?? authUser?.name ?? "");
   const [phone, setPhone] = useState(editing?.phone ?? authUser?.phone ?? "");
-  const [note, setNote] = useState("");
   const [isDefault, setIsDefault] = useState(editing?.isDefault ?? (data?.addresses ?? []).length === 0);
 
   /* ─── موقعیت مکانی روی نقشه ─── */
@@ -45,34 +57,76 @@ export default function AddressFormView() {
   const lng = parseCoordText(lngText, -180, 180);
   const hasLoc = lat != null && lng != null;
 
+  /* ─── استان / شهر + پرواز نقشه ─── */
+  const [province, setProvince] = useState(DEFAULT_PROVINCE);
+  const [city, setCity] = useState(DEFAULT_CITY);
+  const [flyTarget, setFlyTarget] = useState<FlyTarget>(null);
+  const [flyNonce, setFlyNonce] = useState(0);
+  const fly = (lt: number, ln: number, zoom: number) => {
+    setFlyNonce((n) => n + 1);
+    setFlyTarget({ lat: lt, lng: ln, zoom, nonce: flyNonce + 1 });
+  };
+
+  /* مرکز اولیه نقشه: موقعیت آدرس در حال ویرایش، وگرنه شهر پیش‌فرض */
+  const defaultCity = cityOf(DEFAULT_PROVINCE, DEFAULT_CITY);
+  const initialCenter: [number, number] =
+    editing?.lat != null && editing?.lng != null
+      ? [editing.lat, editing.lng]
+      : defaultCity
+        ? [defaultCity.lat, defaultCity.lng]
+        : [32.6539, 51.666];
+  const initialZoom = editing?.lat != null ? 14 : 11;
+
+  const onProvinceChange = (v: string) => {
+    setProvince(v);
+    setCity("");
+    const p = provinceByName(v);
+    if (p) fly(p.center.lat, p.center.lng, 9);
+  };
+
+  const onCityChange = (v: string) => {
+    setCity(v);
+    const ct = cityOf(province, v);
+    if (ct) fly(ct.lat, ct.lng, 13);
+  };
+
+  /** لمس/کلیک روی نقشه یا جابه‌جایی پین */
+  const onPick = (la: number, ln: number) => {
+    setLatText(la.toFixed(6));
+    setLngText(ln.toFixed(6));
+    setAccuracy(null);
+    setLocError(null);
+  };
+
   /** دریافت موقعیت فعلی از GPS مرورگر (نیاز به اجازهٔ دسترسی مکان) */
   const locate = () => {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLocError("مرورگر شما از دریافت موقعیت پشتیبانی نمی‌کند — مختصات را دستی وارد کنید.");
-      setManualOpen(true);
+      setLocError("مرورگر شما از دریافت موقعیت پشتیبانی نمی‌کند — موقعیت را از روی نقشه انتخاب کنید.");
       return;
     }
     setLocating(true);
     setLocError(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLatText(pos.coords.latitude.toFixed(6));
-        setLngText(pos.coords.longitude.toFixed(6));
+        const la = pos.coords.latitude;
+        const ln = pos.coords.longitude;
+        setLatText(la.toFixed(6));
+        setLngText(ln.toFixed(6));
         setAccuracy(Math.round(pos.coords.accuracy));
         setLocating(false);
+        fly(la, ln, 16);
         toast({ title: "موقعیت مکانی دریافت شد 📍", description: "موقعیت دقیق شما روی نقشه ثبت شد." });
       },
       (err) => {
         setLocating(false);
-        setManualOpen(true);
         if (err.code === 1) {
-          setLocError("دسترسی به موقعیت رد شد — از تنظیمات مرورگر اجازهٔ دسترسی به «مکان» را بدهید و دوباره تلاش کنید.");
+          setLocError("دسترسی به موقعیت رد شد — از تنظیمات مرورگر اجازهٔ دسترسی به «مکان» را بدهید و دوباره تلاش کنید. یا شهر خود را انتخاب کنید و پین را روی نقشه بگذارید.");
         } else if (err.code === 2) {
-          setLocError("موقعیت در دسترس نیست — لوکیشن گوشی را روشن کنید یا مختصات را دستی وارد کنید.");
+          setLocError("موقعیت در دسترس نیست — لوکیشن گوشی را روشن کنید؛ یا شهر خود را انتخاب کنید و پین را روی نقشه بگذارید.");
         } else if (err.code === 3) {
-          setLocError("دریافت موقعیت طول کشید — دوباره تلاش کنید یا مختصات را دستی وارد کنید.");
+          setLocError("دریافت موقعیت طول کشید — دوباره تلاش کنید؛ یا شهر خود را انتخاب کنید و پین را روی نقشه بگذارید.");
         } else {
-          setLocError("دریافت موقعیت با خطا مواجه شد.");
+          setLocError("دریافت موقعیت با خطا مواجه شد — پین را دستی روی نقشه بگذارید.");
         }
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
@@ -112,7 +166,7 @@ export default function AddressFormView() {
     <div>
       <ScreenHeader title={editing ? "ویرایش آدرس" : "آدرس جدید"} action={<span className="h-11 w-11 grid place-items-center rounded-full bg-white/60"><MapPin className="h-6 w-6 text-brand" aria-hidden /></span>} />
 
-      {/* ───── موقعیت روی نقشه (GPS مرورگر) ───── */}
+      {/* ───── موقعیت روی نقشه (تعاملی — همیشه باز) ───── */}
       <div className="my-card p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-[13px] font-black text-ink flex items-center gap-1.5">
@@ -129,37 +183,56 @@ export default function AddressFormView() {
           )}
         </div>
 
-        {/* نقشه: امبد واقعی اگر لوکیشن هست، در غیر این صورت حالت خالی */}
-        {hasLoc && lat != null && lng != null ? (
-          <div className="relative h-48 rounded-[16px] overflow-hidden border-2 border-brand-soft bg-white">
-            <iframe
-              src={osmEmbedUrl(lat, lng)}
-              title="موقعیت شما روی نقشه"
-              className="h-full w-full border-0"
-              loading="lazy"
-            />
-            <span className="pointer-events-none absolute bottom-2 inset-x-0 flex justify-center">
-              <span dir="ltr" className="rounded-full bg-white/95 shadow px-3 py-1 text-[10.5px] font-black text-ink tabular-nums">
-                {lat.toFixed(5)}, {lng.toFixed(5)}
-              </span>
+        {/* انتخاب استان و شهر */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <span className="text-[11px] font-bold text-grey flex items-center gap-1">
+              <MapPinned className="h-3.5 w-3.5 text-brand" aria-hidden />
+              استان
             </span>
+            <Select value={province} onValueChange={onProvinceChange} dir="rtl">
+              <SelectTrigger className="mt-1.5 h-11 w-full rounded-2xl border-2 border-brand-soft bg-white text-[13px] font-bold" aria-label="انتخاب استان">
+                <SelectValue placeholder="انتخاب استان" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl max-h-64">
+                {IRAN_PROVINCES.map((p) => (
+                  <SelectItem key={p.name} value={p.name} className="text-[13px]">
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        ) : (
-          <div className="relative h-40 rounded-[16px] overflow-hidden shadow-inner">
-            <Image src="/assets/map-thumb.png" alt="پیش‌نمایش نقشه" fill className="object-cover" sizes="430px" />
-            <span className="absolute inset-0 bg-brand-deep/20" aria-hidden />
-            <span className="absolute inset-0 grid place-items-center">
-              <span className="text-center">
-                <span className="mx-auto mb-2 h-12 w-12 rounded-full bg-brand grid place-items-center shadow-[0_8px_20px_rgba(236,64,122,.5)] border-4 border-white">
-                  <MapPin className="h-6 w-6 text-white" aria-hidden />
-                </span>
-                <span className="block text-[11px] font-black text-white drop-shadow-[0_2px_4px_rgba(88,24,69,.8)]">
-                  موقعیت خود را روی نقشه ثبت کنید
-                </span>
-              </span>
-            </span>
+          <div>
+            <span className="text-[11px] font-bold text-grey">شهر</span>
+            <Select value={city} onValueChange={onCityChange} dir="rtl">
+              <SelectTrigger className="mt-1.5 h-11 w-full rounded-2xl border-2 border-brand-soft bg-white text-[13px] font-bold" aria-label="انتخاب شهر">
+                <SelectValue placeholder="اول استان را انتخاب کنید" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl max-h-64">
+                {(provinceByName(province)?.cities ?? []).map((ct) => (
+                  <SelectItem key={ct.name} value={ct.name} className="text-[13px]">
+                    {ct.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        )}
+        </div>
+        <p className="mb-3 text-[10.5px] text-grey font-bold leading-4">
+          استان و شهرت را انتخاب کن تا نقشه اونجا بره؛ بعد پین دقیق آدرس را با لمس نقشه ثبت کن.
+        </p>
+
+        {/* نقشه تعاملی */}
+        <MapPicker
+          lat={lat}
+          lng={lng}
+          onPick={onPick}
+          center={initialCenter}
+          zoom={initialZoom}
+          flyTarget={flyTarget}
+          height={240}
+        />
 
         {/* دکمهٔ GPS */}
         <button
@@ -195,7 +268,7 @@ export default function AddressFormView() {
         {hasLoc && (
           <div className="mt-2 flex items-center justify-between">
             <span className="text-[10.5px] text-grey font-bold">
-              {accuracy != null ? `دقت موقعیت: ~${toFaDigits(accuracy)} متر` : "مختصات دستی وارد شده"}
+              {accuracy != null ? `دقت موقعیت: ~${toFaDigits(accuracy)} متر` : "موقعیت روی نقشه ثبت شد"}
             </span>
             <button
               type="button"
@@ -316,19 +389,6 @@ export default function AddressFormView() {
             </span>
           </label>
         </div>
-
-        <label className="block">
-          <span className="text-[12px] font-bold text-grey">توضیحات (اختیاری)</span>
-          <span className="mt-2 flex items-center gap-2 rounded-2xl border-2 border-brand-soft bg-white h-12 px-3 focus-within:border-brand transition-colors">
-            <NotebookPen className="h-4 w-4 text-brand shrink-0" aria-hidden />
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="مثلاً: زنگ تفریح، پلاک آبی"
-              className="flex-1 min-w-0 w-0 bg-transparent outline-none text-[13px] font-bold text-ink placeholder:text-grey/70 placeholder:font-normal"
-            />
-          </span>
-        </label>
 
         <div className="flex items-center justify-between rounded-2xl bg-brand-faint px-4 py-3.5">
           <span className="text-[13px] font-black text-ink flex items-center gap-2">

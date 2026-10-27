@@ -60,3 +60,9 @@ server.log
 /public/uploads/
 .zscripts/
 tool-results/
+.credentials*
+# ابزارهای خصوصی استقرار (حاوی مشخصات سرور) — هرگز کامیت نشوند
+scripts/ssh_exec.py
+scripts/sftp_upload.py
+# اسکرین‌شات‌های توسعه
+download/*.png

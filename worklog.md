@@ -217,3 +217,32 @@ Stage Summary:
 - وضعیت نهایی: اپ کامل و سالم — احراز هویت سه‌حالته + صفحه ورود موکاپ‌محور + سورتینگ منو + موجود/ناموجود همگی E2E تأیید شدند؛ ۰ خطای lint و ۰ خطای کنسول
 - کامیت shipp شده: 18d28c3 روی برنچ main (ریپو AbstractAxisX/mahi-tanur)؛ هیچ فیکسی در حین وریفیکیشن لازم نشد — همه چیز از اول پاس بود
 - .env در کامیت دست‌نخورده ماند: DATABASE_URL=file:../db/custom.db (نسخه نسبی کامیت‌شده قبلی)
+# Worklog
+
+---
+Task ID: 1
+Agent: Main Agent (Z.ai)
+Task: استقرار کامل ریپو mahi-tanur روی سرور 87.107.152.179 با SSL، دیتابیس و مشخصات ادمین
+
+Work Log:
+- بررسی ریپو GitHub (AbstractAxisX/mahi-tanur): Next.js 16 + Prisma SQLite + next-auth؛ ورود ادمین با ADMIN_USER/ADMIN_PASS (پیش‌فرض admin/admin123)
+- اتصال SSH به سرور (root@87.107.152.179) با paramiko — Ubuntu 24.04 LTS، 40GB دیسک، 3.8GB رم
+- تشخیص محدودیت‌های شبکه ایران: deb.nodesource.com (تایم‌اوت دانلود)، registry.npmjs.org (بلاک)؛ nodejs.org و npmmirror.com و github.com سالم
+- نصب Node.js v22.14.0 از تاربال رسمی nodejs.org در /usr/local
+- کلون ریپو روی سرور در /var/www/mahi-tanur (41MB)
+- استراتژی بیلد لوکال: npm install لوکال (1.2GB node_modules) + prisma db push + seed-prod + بیلد standalone (122MB) + تاربال 47.5MB + آپلود SFTP (32 ثانیه)
+- راه‌اندازی PM2 7.1.1 (نصب از npmmirror) + ecosystem.config.cjs با env های پروداکشن + pm2 save + pm2 startup systemd
+- Nginx 1.24 + کانفیگ reverse_proxy برای پورت 80 و 443 + SSL self-signed (10 سال، SAN=IP) در /etc/nginx/ssl/
+- کرون بکاپ هر ۶ ساعت (scripts/backup.sh) + اولین بکاپ اجرا شد
+- certbot نصب شد (آماده برای Let's Encrypt وقتی دامنه وصل شود)
+- تست‌های خارجی: HTTP 200، HTTPS 200، ورود ادمین موفق/اشتباه 401، ورود کاربر، asset ها 200، عنوان صفحه درست
+- اسکرین‌شات از بیلد یکسان لوکال + تأیید رندر با VLM (کامل و سالم)
+- حذف کاربر تستی از دیتابیس پروداکشن؛ پاک‌سازی /tmp سرور
+
+Stage Summary:
+- سایت زنده: http://87.107.152.179 و https://87.107.152.179 (SSL خودامضا؛ certbot آماده برای دامنه)
+- ادمین: admin / admin123 (قابل تغییر از .env و ecosystem.config.cjs)
+- دیتابیس: SQLite پروداکشن در /var/www/mahi-tanur/db/custom.db (فقط seed پروداکشن — بدون دیتای تستی)
+- بکاپ: هر ۶ ساعت در /var/www/mahi-tanur/backups/ (نگهداری ۱۴ نسخه)
+- یادداشت امنیتی: توکن GitHub و رمز سرور در چت به اشتراک گذاشته شد — کارفرما باید هر دو را عوض کند
+

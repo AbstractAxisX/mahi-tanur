@@ -1,43 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-
-const NUMERIC = ["order", "price"];
-const STRINGS = [
-  "name", "title", "label", "shift", "icon", "code", "subtitle", "full", "receiver",
-  "phone", "note", "image", "description", "badgeText", "appName", "appSlogan",
-  "heroImage", "heroTitle", "heroSubtitle", "heroCtaText", "heroBadgeText",
-  "logoImage", "promoImage", "promoLink",
-  "addressText", "workHours", "phone", "footerNote", "instagram", "role", "avatar", "fishName",
-];
-const BOOLEANS = ["active", "isDefault", "inStock"];
-const SKIPPED = ["id", "createdAt", "category", "favorites"];
-
-function pick(body: Record<string, unknown>) {
-  const data: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(body)) {
-    if (SKIPPED.includes(k) || v === undefined) continue;
-    if (k === "categoryId") {
-      if (v) data.categoryId = String(v);
-      continue;
-    }
-    if (NUMERIC.includes(k)) {
-      data[k] = Number(v) || 0;
-    } else if (BOOLEANS.includes(k)) {
-      data[k] = Boolean(v);
-    } else if (STRINGS.includes(k)) {
-      data[k] = v === null || v === undefined ? null : String(v);
-    } else if (k === "status") {
-      data[k] = String(v);
-    }
-  }
-  return data;
-}
+import { pickAdminData } from "@/lib/admin-coerce";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ model: string; id: string }> }) {
   const { model, id } = await params;
   try {
-    const body = await req.json();
-    const data = pick(body);
+    const body = (await req.json()) as Record<string, unknown>;
+    const data = pickAdminData(body);
     switch (model) {
       case "categories":
         return NextResponse.json(await db.fishCategory.update({ where: { id }, data }));
@@ -52,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ mo
       case "settings":
         return NextResponse.json(await db.siteSettings.update({ where: { id: 1 }, data }));
       case "orders":
-        return NextResponse.json(await db.order.update({ where: { id }, data: pick({ status: body.status, note: body.note }) }));
+        return NextResponse.json(await db.order.update({ where: { id }, data: pickAdminData({ status: body.status, note: body.note }) }));
       case "addresses":
         if (data.isDefault === true) await db.address.updateMany({ data: { isDefault: false } });
         return NextResponse.json(await db.address.update({ where: { id }, data }));

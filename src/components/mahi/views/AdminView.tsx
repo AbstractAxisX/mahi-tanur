@@ -14,7 +14,7 @@ import {
 import { ScreenHeader, PillBtn, CardTitle, StatusBadge } from "../ui";
 import { useMahiStore } from "../store";
 import { cn } from "@/lib/utils";
-import { faPrice, toFaDigits, faDateTime } from "@/lib/format";
+import { faPrice, toFaDigits, toEnDigits, faDateTime } from "@/lib/format";
 import { osmEmbedUrl } from "@/lib/geo";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -91,19 +91,28 @@ function parseExtras(json: string): { name: string }[] {
   }
 }
 
+/** نرمال‌سازی مقدار عددی از ورودی فارسی/انگلیسی — «۱۹۵٬۰۰۰» یا «195,000» → 195000 */
+export function parseFaNumber(v: unknown): number {
+  const s = String(v ?? "");
+  const t = toEnDigits(s).replace(/[^\d.\-]/g, "");
+  if (!t || t === "-" || t === ".") return 0;
+  const n = Number(t);
+  return Number.isFinite(n) ? Math.round(n) : 0;
+}
+
 /** ساخت فرم از رکورد (یا حالت خالی برای افزودن) */
 function recordToForm(fields: FieldDef[], rec: AdminRecord | null): FormState {
   const f: FormState = {};
   for (const fd of fields) {
     if (!rec) {
-      if (fd.type === "number") f[fd.key] = typeof fd.def === "number" ? fd.def : 0;
+      if (fd.type === "number") f[fd.key] = typeof fd.def === "number" ? String(fd.def) : "";
       else if (fd.type === "switch") f[fd.key] = fd.def === true;
       else if (fd.type === "select") f[fd.key] = fd.options?.[0]?.value ?? "";
       else f[fd.key] = "";
       continue;
     }
     const v = rec[fd.key];
-    if (fd.type === "number") f[fd.key] = typeof v === "number" ? v : 0;
+    if (fd.type === "number") f[fd.key] = typeof v === "number" ? String(v) : "";
     else if (fd.type === "switch") f[fd.key] = v === true;
     else f[fd.key] = typeof v === "string" ? v : "";
   }
@@ -115,7 +124,7 @@ function serializeForm(fields: FieldDef[], form: FormState): Record<string, stri
   const out: Record<string, string | number | boolean | null> = {};
   for (const fd of fields) {
     const v = form[fd.key];
-    if (fd.type === "number") out[fd.key] = Number(v) || 0;
+    if (fd.type === "number") out[fd.key] = parseFaNumber(v);
     else if (fd.type === "switch") out[fd.key] = v === true;
     else if (fd.type === "image") out[fd.key] = v ? String(v) : null;
     else out[fd.key] = v === undefined || v === null ? "" : String(v);
@@ -447,15 +456,14 @@ function FieldInput({
     ) : (
       <Input
         id={id}
-        type={def.type === "number" ? "number" : "text"}
+        type={def.type === "number" ? "text" : "text"}
+        inputMode={def.type === "number" ? "numeric" : undefined}
         dir={def.type === "number" || ltrField ? "ltr" : "auto"}
         value={String(value ?? "")}
         onChange={(e) =>
           onChange(
             def.type === "number"
-              ? e.target.value === ""
-                ? 0
-                : Number(e.target.value)
+              ? e.target.value.replace(/[^\d۰-۹٠-٩.\-]/g, "")
               : e.target.value
           )
         }
@@ -472,6 +480,11 @@ function FieldInput({
       </Label>
       {control}
       {def.hint ? <p className="text-[10.5px] text-grey leading-4">{def.hint}</p> : null}
+      {def.type === "number" && def.key === "price" && parseFaNumber(value) > 0 ? (
+        <p className="text-[10.5px] font-black text-teal-deep leading-4" dir="rtl">
+          {faPrice(parseFaNumber(value))}
+        </p>
+      ) : null}
     </div>
   );
 }

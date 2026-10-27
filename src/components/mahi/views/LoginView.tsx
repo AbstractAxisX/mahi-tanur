@@ -361,11 +361,6 @@ export default function LoginView() {
                     <ShieldCheck className="h-4 w-4" aria-hidden />
                     {adminBusy ? "در حال ورود…" : "ورود به پنل مدیریت"}
                   </button>
-
-                  {/* راهنمای مشخصات مدیر (درخواست صریح کارفرما) */}
-                  <p className="rounded-xl bg-brand-faint border border-brand-mist px-3 py-2 text-[11px] font-bold text-brand-dark leading-5 text-center">
-                    مشخصات ورود مدیر — <span dir="ltr" className="tabular-nums">نام کاربری: admin — رمز: admin123</span>
-                  </p>
                 </div>
               </motion.div>
             )}
